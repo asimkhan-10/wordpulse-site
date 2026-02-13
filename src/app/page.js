@@ -1,144 +1,268 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { Search, Copy, Check, Filter, X, Zap, Star, ChevronRight } from 'lucide-react';
-import wordData from './data/words.json';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown } from 'lucide-react';
 
-export default function WordPulse() {
+/**
+ * PATH RESOLUTION:
+ * Using the standard Next.js '@' alias to resolve the path from the 'src' directory.
+ */
+import wordDataImport from '@/app/data/words.json';
+
+const wordData = wordDataImport || { allWords: [], commonWords: [] };
+
+export default function App() {
+  const [knownPos, setKnownPos] = useState(["", "", "", "", ""]);
+  const [includeLetters, setIncludeLetters] = useState("");
+  const [excludeLetters, setExcludeLetters] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [startsWith, setStartsWith] = useState("");
-  const [endsWith, setEndsWith] = useState("");
-  const [contains, setContains] = useState("");
-  const [excludes, setExcludes] = useState("");
   const [commonOnly, setCommonOnly] = useState(true);
   const [copiedWord, setCopiedWord] = useState(null);
+  
+  // Professional Practice: Limit initial display to prevent wall-of-text
+  // Updated to 25 based on your preference for a tighter UI
+  const [displayLimit, setDisplayLimit] = useState(25);
 
   const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
   const allWords = wordData?.allWords || [];
   const commonWords = wordData?.commonWords || [];
 
+  // Reset display limit when filters change
+  useEffect(() => {
+    setDisplayLimit(25);
+  }, [knownPos, includeLetters, excludeLetters, searchTerm, commonOnly]);
+
   const filteredWords = useMemo(() => {
     const source = commonOnly ? commonWords : allWords;
+    if (!source) return [];
+
     return source.filter(word => {
       const w = word.toLowerCase();
-      if (startsWith && !w.startsWith(startsWith.toLowerCase())) return false;
-      if (endsWith && !w.endsWith(endsWith.toLowerCase())) return false;
-      if (contains) {
-        const letters = contains.toLowerCase().split(",").map(i => i.trim()).filter(i => i);
+      for (let i = 0; i < 5; i++) {
+        if (knownPos[i] && w[i] !== knownPos[i].toLowerCase()) return false;
+      }
+      if (includeLetters) {
+        const letters = includeLetters.toLowerCase().split(/[\s,]+/).filter(Boolean);
         if (!letters.every(char => w.includes(char))) return false;
       }
-      if (excludes) {
-        const letters = excludes.toLowerCase().split(",").map(i => i.trim()).filter(i => i);
+      if (excludeLetters) {
+        const letters = excludeLetters.toLowerCase().split(/[\s,]+/).filter(Boolean);
         if (letters.some(char => w.includes(char))) return false;
       }
       if (searchTerm && !w.includes(searchTerm.toLowerCase())) return false;
       return true;
     });
-  }, [searchTerm, startsWith, endsWith, contains, excludes, commonOnly, allWords, commonWords]);
+  }, [knownPos, includeLetters, excludeLetters, searchTerm, commonOnly, allWords, commonWords]);
+
+  const handleGridChange = (index, value) => {
+    const newPos = [...knownPos];
+    const char = value.replace(/[^a-zA-Z]/g, '').slice(-1).toUpperCase();
+    newPos[index] = char;
+    setKnownPos(newPos);
+    
+    if (char && index < 4) {
+      document.getElementById(`grid-${index + 1}`)?.focus();
+    }
+  };
 
   const copyToClipboard = (word) => {
-    navigator.clipboard?.writeText(word);
-    setCopiedWord(word);
-    setTimeout(() => setCopiedWord(null), 2000);
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(word);
+      setCopiedWord(word);
+      setTimeout(() => setCopiedWord(null), 2000);
+    }
+  };
+
+  const resetAll = () => {
+    setKnownPos(["", "", "", "", ""]);
+    setIncludeLetters("");
+    setExcludeLetters("");
+    setSearchTerm("");
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 selection:bg-purple-500/30 font-sans antialiased">
-      <nav className="border-b border-slate-800 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 shadow-2xl">
+    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans antialiased cursor-default select-none">
+      <nav className="border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-xl sticky top-0 z-50 px-6 py-4 select-none">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap size={22} className="text-purple-500 fill-purple-500" />
-            <span className="text-xl font-bold text-white tracking-tighter uppercase">WordPulse</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg shadow-purple-500/20">
+              <Zap size={20} className="text-white fill-white" />
+            </div>
+            <span className="text-xl font-black text-white tracking-tighter uppercase italic">WordPulse</span>
           </div>
-          <div className="text-[10px] text-slate-500 font-mono bg-slate-900 px-4 py-1.5 rounded-full border border-slate-800 font-bold">
-             {allWords.length} WORDS LOADED
+          <div className="hidden md:block">
+            <span className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase bg-slate-900 px-4 py-2 rounded-full border border-slate-800">
+              SOLVER ACTIVE: {allWords.length} WORDS
+            </span>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <aside className="space-y-6">
-            <div className="bg-[#0f172a] border border-slate-800 rounded-3xl p-6 shadow-2xl">
-              <div onClick={() => setCommonOnly(!commonOnly)} className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-2xl cursor-pointer hover:border-purple-500/50 transition-all mb-8 shadow-inner">
-                <div className="flex items-center gap-2">
-                  <Star size={14} className={commonOnly ? "text-yellow-400 fill-yellow-400" : "text-slate-600"} />
-                  <span className="text-xs font-bold text-white uppercase tracking-tighter">Common Only</span>
+      <main className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          <aside className="lg:col-span-4 space-y-6 select-none">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-purple-600/10 blur-[80px] rounded-full" />
+              
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                  <Hash size={14} className="text-purple-500" /> 5 Letter Word
+                </h2>
+              </div>
+
+              <div className="space-y-4 mb-10">
+                <div className="flex items-center justify-between px-1">
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Correct Letter Positions</p>
+                   <Info size={12} className="text-slate-700" title="Corresponds to Green boxes in Wordle" />
                 </div>
-                <div className={`w-10 h-5 rounded-full relative transition-colors ${commonOnly ? 'bg-purple-600 shadow-[0_0_10px_rgba(147,51,234,0.3)]' : 'bg-slate-800'}`}>
-                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${commonOnly ? 'left-6' : 'left-1'}`} />
+                <div className="flex gap-2">
+                  {knownPos.map((val, i) => (
+                    <input
+                      key={i}
+                      id={`grid-${i}`}
+                      type="text"
+                      value={val}
+                      onChange={(e) => handleGridChange(i, e.target.value)}
+                      className={`w-full aspect-square text-center text-2xl font-black rounded-2xl border-2 transition-all outline-none shadow-inner cursor-text
+                        ${val ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'bg-slate-950 border-slate-800 text-white focus:border-purple-500'}`}
+                      placeholder={(i+1).toString()}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="space-y-5">
-                <FilterInput label="Starts With" val={startsWith} set={setStartsWith} ph="e.g. s" />
-                <FilterInput label="Ends With" val={endsWith} set={setEndsWith} ph="e.g. y" />
-                <FilterInput label="Contains" val={contains} set={setContains} ph="a, e" />
-                <FilterInput label="Exclude" val={excludes} set={setExcludes} ph="x, q" />
-                <button onClick={() => {setStartsWith(""); setEndsWith(""); setContains(""); setExcludes(""); setSearchTerm("");}} className="w-full py-4 text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest border border-slate-800 rounded-2xl hover:bg-slate-800 transition-all">
-                  RESET ALL
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Include Letters</label>
+                  <input 
+                    type="text" 
+                    value={includeLetters}
+                    onChange={(e) => setIncludeLetters(e.target.value)}
+                    placeholder="e.g. A, E (Yellow boxes)" 
+                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-purple-500 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Exclude Letters</label>
+                  <input 
+                    type="text" 
+                    value={excludeLetters}
+                    onChange={(e) => setExcludeLetters(e.target.value)}
+                    placeholder="e.g. X, Q (Grey boxes)" 
+                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-red-900 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" 
+                  />
+                </div>
+              </div>
+
+              <div className="mt-10 pt-8 border-t border-slate-800">
+                <div onClick={() => setCommonOnly(!commonOnly)} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-2xl cursor-pointer hover:border-purple-500/30 transition-all shadow-inner select-none">
+                  <div className="flex items-center gap-2">
+                    <Star size={14} className={commonOnly ? "text-yellow-500 fill-yellow-500" : "text-slate-700"} />
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Common Only</span>
+                  </div>
+                  <div className={`w-8 h-4 rounded-full relative transition-colors ${commonOnly ? 'bg-purple-600' : 'bg-slate-800'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${commonOnly ? 'left-4.5' : 'left-0.5'}`} />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={resetAll} 
+                  className="w-full mt-6 py-4 text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest border border-slate-800 rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <RotateCcw size={12} /> Reset
                 </button>
               </div>
             </div>
           </aside>
 
-          <section className="lg:col-span-3 space-y-6">
+          <section className="lg:col-span-8 space-y-6">
             <div className="relative group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-500" size={20} />
-              <input type="text" placeholder="Live search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#0f172a] border border-slate-800 rounded-[2rem] py-6 pl-16 pr-8 outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 text-xl font-medium text-white shadow-2xl transition-all" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-purple-500 transition-colors" size={24} />
+              <input 
+                type="text" 
+                placeholder="Live word exploration..." 
+                value={searchTerm} 
+                onChange={(e) => setSearchTerm(e.target.value)} 
+                className="w-full bg-[#0f172a] border border-slate-800 rounded-[2.5rem] py-7 pl-16 pr-8 outline-none focus:border-purple-500 text-2xl font-medium text-white shadow-2xl transition-all placeholder:text-slate-800 cursor-text" 
+              />
             </div>
             
-            <div className="bg-[#0f172a]/30 border border-slate-800 rounded-[2.5rem] p-8 min-h-[600px] backdrop-blur-sm relative overflow-hidden">
-              <div className="flex items-center justify-between mb-10 border-b border-slate-800 pb-8">
-                <span className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">{filteredWords.length} Matches Found</span>
-                <span className="text-[10px] font-black text-purple-400 bg-purple-500/10 px-4 py-1.5 rounded-full border border-purple-500/20">{commonOnly ? "Curated" : "Dictionary"}</span>
+            <div className="bg-[#0f172a]/30 border border-slate-800 rounded-[3rem] p-8 min-h-[600px] backdrop-blur-md relative shadow-2xl overflow-hidden cursor-default">
+              <div className="flex items-center justify-between mb-10 border-b border-slate-800/50 pb-8 select-none">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
+                    {filteredWords.length} Matches Found
+                  </span>
+                  {filteredWords.length > displayLimit && (
+                    <span className="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest">
+                      Showing top {displayLimit} results. Use filters to narrow down.
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-1.5">
+                   <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse delay-75" />
+                </div>
               </div>
               
               {filteredWords.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {filteredWords.slice(0, 250).map(word => (
-                    <button key={word} onClick={() => copyToClipboard(word)} className="p-5 bg-slate-900/80 hover:bg-purple-600/10 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-center transition-all group relative overflow-hidden shadow-lg active:scale-95">
-                      <span className="font-mono font-bold uppercase tracking-[0.4em] text-base text-slate-300 group-hover:text-white">{word}</span>
-                      <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 transition-all duration-300 ${copiedWord === word ? 'opacity-100' : 'opacity-0'}`}><Check size={22} className="text-white" /></div>
-                    </button>
-                  ))}
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {filteredWords.slice(0, displayLimit).map(word => (
+                      <button 
+                        key={word} 
+                        onClick={() => copyToClipboard(word)} 
+                        className="p-6 bg-slate-900/60 hover:bg-purple-600/10 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-center transition-all group relative active:scale-95 overflow-hidden shadow-lg cursor-pointer"
+                      >
+                        <span className="font-mono font-black uppercase tracking-[0.4em] text-lg text-slate-400 group-hover:text-white transition-colors">
+                          {word}
+                        </span>
+                        <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 transition-all duration-300 ${copiedWord === word ? 'opacity-100' : 'opacity-0'}`}>
+                          <Check size={24} className="text-white" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {filteredWords.length > displayLimit && (
+                    <div className="mt-12 flex justify-center pb-8">
+                      <button 
+                        onClick={() => setDisplayLimit(prev => prev + 100)}
+                        className="px-8 py-4 bg-slate-900/50 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.3em] transition-all flex items-center gap-3 group"
+                      >
+                        Show More Words
+                        <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-40 select-none">
+                  <X size={48} className="text-slate-800 mb-4" />
+                  <p className="font-black uppercase tracking-[0.4em] text-slate-800">No matching words</p>
                 </div>
-              ) : <p className="text-center text-slate-700 py-32 font-bold uppercase tracking-widest">No matching words</p>}
+              )}
             </div>
 
-            {/* SEO Alphabet Footer Section */}
-            <div className="mt-12 bg-slate-950/50 border border-slate-900 rounded-[2.5rem] p-10">
-              <h2 className="text-sm font-black text-slate-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
-                <Filter size={14} /> Browse 5 Letter Words by Letter
-              </h2>
+            <div className="mt-12 bg-slate-950/20 border border-slate-900 rounded-[2.5rem] p-10 select-none">
+              <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] mb-8">Quick Index</p>
               <div className="flex flex-wrap gap-2">
                 {alphabet.map((char) => (
-                  <Link 
+                  <a 
                     key={char} 
-                    href={`/starting-with/${char}`}
-                    className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-sm font-bold text-slate-400 hover:border-purple-500 hover:text-white hover:bg-purple-500/10 transition-all uppercase"
+                    href={`/starting-with/${char}`} 
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-500 hover:border-purple-500 hover:text-white transition-all uppercase cursor-pointer"
                   >
                     {char}
-                  </Link>
+                  </a>
                 ))}
-              </div>
-              <div className="mt-8 pt-8 border-t border-slate-900 flex justify-between items-center text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">
-                <span>WordPulse v1.0.0</span>
-                <span>Optimized for Search Engines</span>
               </div>
             </div>
           </section>
         </div>
       </main>
-    </div>
-  );
-}
-
-function FilterInput({ label, val, set, ph }) {
-  return (
-    <div className="space-y-2">
-      <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">{label}</label>
-      <input type="text" value={val} onChange={(e) => set(e.target.value)} placeholder={ph} className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all text-white placeholder:text-slate-900 shadow-inner font-medium" />
     </div>
   );
 }
