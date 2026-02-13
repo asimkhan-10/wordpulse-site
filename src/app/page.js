@@ -4,8 +4,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown } from 'lucide-react';
 
 /**
- * PATH RESOLUTION:
- * Using the standard Next.js '@' alias to resolve the path from the 'src' directory.
+ * PATH RESOLUTION FIX:
+ * Using the standard Next.js '@' alias which points to the 'src' directory.
+ * This ensures the path is resolved correctly regardless of where the build runs.
+ * Ensure your file is located at: src/app/data/words.json
  */
 import wordDataImport from '@/app/data/words.json';
 
@@ -18,16 +20,12 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [commonOnly, setCommonOnly] = useState(true);
   const [copiedWord, setCopiedWord] = useState(null);
-  
-  // Professional Practice: Limit initial display to prevent wall-of-text
-  // Updated to 25 based on your preference for a tighter UI
   const [displayLimit, setDisplayLimit] = useState(25);
 
   const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
   const allWords = wordData?.allWords || [];
   const commonWords = wordData?.commonWords || [];
 
-  // Reset display limit when filters change
   useEffect(() => {
     setDisplayLimit(25);
   }, [knownPos, includeLetters, excludeLetters, searchTerm, commonOnly]);
@@ -59,7 +57,6 @@ export default function App() {
     const char = value.replace(/[^a-zA-Z]/g, '').slice(-1).toUpperCase();
     newPos[index] = char;
     setKnownPos(newPos);
-    
     if (char && index < 4) {
       document.getElementById(`grid-${index + 1}`)?.focus();
     }
@@ -81,39 +78,42 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans antialiased cursor-default select-none">
-      <nav className="border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-xl sticky top-0 z-50 px-6 py-4 select-none">
+    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans antialiased cursor-default select-none overflow-x-hidden">
+      <nav className="border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-xl sticky top-0 z-50 px-4 py-4 md:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg shadow-purple-500/20">
               <Zap size={20} className="text-white fill-white" />
             </div>
-            <span className="text-xl font-black text-white tracking-tighter uppercase italic">WordPulse</span>
+            <span className="text-lg md:text-xl font-black text-white tracking-tighter uppercase italic">WordPulse</span>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden sm:block">
             <span className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase bg-slate-900 px-4 py-2 rounded-full border border-slate-800">
-              SOLVER ACTIVE: {allWords.length} WORDS
+              Database: {allWords.length} Words
             </span>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <main className="max-w-7xl mx-auto px-4 py-6 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
           
-          <aside className="lg:col-span-4 space-y-6 select-none">
-            <div className="bg-[#0f172a] border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+          <aside className="lg:col-span-4 space-y-6">
+            <div className="bg-[#0f172a] border border-slate-800 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-purple-600/10 blur-[80px] rounded-full" />
               
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
-                  <Hash size={14} className="text-purple-500" /> 5 Letter Word
+                  <Hash size={14} className="text-purple-500" /> Professional Solver
                 </h2>
+                <button onClick={resetAll} className="text-[10px] font-bold text-slate-600 hover:text-purple-400 transition-colors uppercase tracking-widest">
+                  Reset
+                </button>
               </div>
 
               <div className="space-y-4 mb-10">
                 <div className="flex items-center justify-between px-1">
-                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Correct Letter Positions</p>
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Letter Positions</p>
                    <Info size={12} className="text-slate-700" title="Corresponds to Green boxes in Wordle" />
                 </div>
                 <div className="flex gap-2">
@@ -124,7 +124,7 @@ export default function App() {
                       type="text"
                       value={val}
                       onChange={(e) => handleGridChange(i, e.target.value)}
-                      className={`w-full aspect-square text-center text-2xl font-black rounded-2xl border-2 transition-all outline-none shadow-inner cursor-text
+                      className={`w-full aspect-square text-center text-xl md:text-2xl font-black rounded-xl md:rounded-2xl border-2 transition-all outline-none shadow-inner cursor-text
                         ${val ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'bg-slate-950 border-slate-800 text-white focus:border-purple-500'}`}
                       placeholder={(i+1).toString()}
                     />
@@ -134,30 +134,17 @@ export default function App() {
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Include Letters</label>
-                  <input 
-                    type="text" 
-                    value={includeLetters}
-                    onChange={(e) => setIncludeLetters(e.target.value)}
-                    placeholder="e.g. A, E (Yellow boxes)" 
-                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-purple-500 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" 
-                  />
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Include</label>
+                  <input type="text" value={includeLetters} onChange={(e) => setIncludeLetters(e.target.value)} placeholder="e.g. A, E (Yellow)" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-purple-500 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" />
                 </div>
-
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Exclude Letters</label>
-                  <input 
-                    type="text" 
-                    value={excludeLetters}
-                    onChange={(e) => setExcludeLetters(e.target.value)}
-                    placeholder="e.g. X, Q (Grey boxes)" 
-                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-red-900 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" 
-                  />
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Exclude</label>
+                  <input type="text" value={excludeLetters} onChange={(e) => setExcludeLetters(e.target.value)} placeholder="e.g. X, Q (Grey)" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-red-900 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" />
                 </div>
               </div>
 
               <div className="mt-10 pt-8 border-t border-slate-800">
-                <div onClick={() => setCommonOnly(!commonOnly)} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-2xl cursor-pointer hover:border-purple-500/30 transition-all shadow-inner select-none">
+                <div onClick={() => setCommonOnly(!commonOnly)} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-2xl cursor-pointer hover:border-purple-500/30 transition-all shadow-inner">
                   <div className="flex items-center gap-2">
                     <Star size={14} className={commonOnly ? "text-yellow-500 fill-yellow-500" : "text-slate-700"} />
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Common Only</span>
@@ -166,13 +153,6 @@ export default function App() {
                     <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${commonOnly ? 'left-4.5' : 'left-0.5'}`} />
                   </div>
                 </div>
-
-                <button 
-                  onClick={resetAll} 
-                  className="w-full mt-6 py-4 text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest border border-slate-800 rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <RotateCcw size={12} /> Reset
-                </button>
               </div>
             </div>
           </aside>
@@ -180,24 +160,18 @@ export default function App() {
           <section className="lg:col-span-8 space-y-6">
             <div className="relative group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-purple-500 transition-colors" size={24} />
-              <input 
-                type="text" 
-                placeholder="Live word exploration..." 
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                className="w-full bg-[#0f172a] border border-slate-800 rounded-[2.5rem] py-7 pl-16 pr-8 outline-none focus:border-purple-500 text-2xl font-medium text-white shadow-2xl transition-all placeholder:text-slate-800 cursor-text" 
-              />
+              <input type="text" placeholder="Search dictionary..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#0f172a] border border-slate-800 rounded-[2rem] md:rounded-[2.5rem] py-6 pl-16 pr-8 outline-none focus:border-purple-500 text-xl md:text-2xl font-medium text-white shadow-2xl transition-all placeholder:text-slate-800 cursor-text" />
             </div>
             
-            <div className="bg-[#0f172a]/30 border border-slate-800 rounded-[3rem] p-8 min-h-[600px] backdrop-blur-md relative shadow-2xl overflow-hidden cursor-default">
-              <div className="flex items-center justify-between mb-10 border-b border-slate-800/50 pb-8 select-none">
+            <div className="bg-[#0f172a]/30 border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 min-h-[500px] backdrop-blur-md relative shadow-2xl overflow-hidden cursor-default">
+              <div className="flex items-center justify-between mb-8 border-b border-slate-800/50 pb-8">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
-                    {filteredWords.length} Matches Found
+                  <span className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
+                    {filteredWords.length} Matches
                   </span>
                   {filteredWords.length > displayLimit && (
-                    <span className="text-[10px] font-bold text-purple-400/60 uppercase tracking-widest">
-                      Showing top {displayLimit} results. Use filters to narrow down.
+                    <span className="text-[9px] md:text-[10px] font-bold text-purple-400/60 uppercase tracking-widest">
+                      Showing top {displayLimit}. Use filters to narrow.
                     </span>
                   )}
                 </div>
@@ -209,52 +183,35 @@ export default function App() {
               
               {filteredWords.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                     {filteredWords.slice(0, displayLimit).map(word => (
-                      <button 
-                        key={word} 
-                        onClick={() => copyToClipboard(word)} 
-                        className="p-6 bg-slate-900/60 hover:bg-purple-600/10 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-center transition-all group relative active:scale-95 overflow-hidden shadow-lg cursor-pointer"
-                      >
-                        <span className="font-mono font-black uppercase tracking-[0.4em] text-lg text-slate-400 group-hover:text-white transition-colors">
-                          {word}
-                        </span>
-                        <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 transition-all duration-300 ${copiedWord === word ? 'opacity-100' : 'opacity-0'}`}>
-                          <Check size={24} className="text-white" />
-                        </div>
+                      <button key={word} onClick={() => copyToClipboard(word)} className="p-4 md:p-6 bg-slate-900/60 hover:bg-purple-600/10 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-center transition-all group relative active:scale-95 overflow-hidden shadow-lg cursor-pointer">
+                        <span className="font-mono font-black uppercase tracking-[0.3em] text-sm md:text-lg text-slate-400 group-hover:text-white transition-colors">{word}</span>
+                        <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 transition-all duration-300 ${copiedWord === word ? 'opacity-100' : 'opacity-0'}`}><Check size={20} className="text-white" /></div>
                       </button>
                     ))}
                   </div>
-
                   {filteredWords.length > displayLimit && (
                     <div className="mt-12 flex justify-center pb-8">
-                      <button 
-                        onClick={() => setDisplayLimit(prev => prev + 100)}
-                        className="px-8 py-4 bg-slate-900/50 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.3em] transition-all flex items-center gap-3 group"
-                      >
-                        Show More Words
-                        <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                      <button onClick={() => setDisplayLimit(prev => prev + 50)} className="px-8 py-4 bg-slate-900/50 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.3em] transition-all flex items-center gap-3 group">
+                        Show More <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
                       </button>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center py-40 select-none">
+                <div className="flex flex-col items-center justify-center py-40">
                   <X size={48} className="text-slate-800 mb-4" />
-                  <p className="font-black uppercase tracking-[0.4em] text-slate-800">No matching words</p>
+                  <p className="font-black uppercase tracking-[0.4em] text-slate-800">No matches</p>
                 </div>
               )}
             </div>
 
-            <div className="mt-12 bg-slate-950/20 border border-slate-900 rounded-[2.5rem] p-10 select-none">
-              <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] mb-8">Quick Index</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-8 md:mt-12 bg-slate-950/20 border border-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 select-none">
+              <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] mb-6 md:mb-8 text-center sm:text-left">Dictionary Index</p>
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 {alphabet.map((char) => (
-                  <a 
-                    key={char} 
-                    href={`/starting-with/${char}`} 
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-500 hover:border-purple-500 hover:text-white transition-all uppercase cursor-pointer"
-                  >
+                  <a key={char} href={`/starting-with/${char}`} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-[10px] md:text-xs font-bold text-slate-500 hover:border-purple-500 hover:text-white transition-all uppercase cursor-pointer">
                     {char}
                   </a>
                 ))}
