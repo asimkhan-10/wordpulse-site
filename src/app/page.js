@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown } from 'lucide-react';
+import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown, ShieldCheck, Lightbulb, HelpCircle } from 'lucide-react';
 
 /**
- * PATH RESOLUTION FIX:
- * Using the standard Next.js '@' alias which points to the 'src' directory.
- * This ensures the path is resolved correctly regardless of where the build runs.
- * Ensure your file is located at: src/app/data/words.json
+ * WordPulse: Professional Solver UI
+ * Theme: Light/Clean (Slate/Purple/White)
  */
-import wordDataImport from '@/app/data/words.json';
+import wordDataImport from './data/words.json';
 
 const wordData = wordDataImport || { allWords: [], commonWords: [] };
 
@@ -64,9 +62,14 @@ export default function App() {
 
   const copyToClipboard = (word) => {
     if (typeof navigator !== 'undefined') {
-      navigator.clipboard.writeText(word);
+      const el = document.createElement('textarea');
+      el.value = word;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
       setCopiedWord(word);
-      setTimeout(() => setCopiedWord(null), 2000);
+      setTimeout(() => setCopiedWord(null), 1500);
     }
   };
 
@@ -78,148 +81,295 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans antialiased cursor-default select-none overflow-x-hidden">
-      <nav className="border-b border-slate-800/50 bg-[#0f172a]/80 backdrop-blur-xl sticky top-0 z-50 px-4 py-4 md:px-6">
+    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900 pb-20">
+
+      {/* Navigation */}
+      <nav className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-3 mb-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl shadow-lg shadow-purple-500/20">
-              <Zap size={20} className="text-white fill-white" />
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-slate-900 rounded-lg shadow-md">
+              <Zap size={16} className="text-white fill-white" />
             </div>
-            <span className="text-lg md:text-xl font-black text-white tracking-tighter uppercase italic">WordPulse</span>
+            <h1 className="text-lg font-black text-slate-900 tracking-tighter uppercase italic">WordPulse</h1>
           </div>
-          <div className="hidden sm:block">
-            <span className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase bg-slate-900 px-4 py-2 rounded-full border border-slate-800">
-              Database: {allWords.length} Words
+          {/* <div className="hidden md:block">
+            <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+              Database: {allWords.length.toLocaleString()} Words
             </span>
-          </div>
+          </div> */}
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
-          
-          <aside className="lg:col-span-4 space-y-6">
-            <div className="bg-[#0f172a] border border-slate-800 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-purple-600/10 blur-[80px] rounded-full" />
-              
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
-                  <Hash size={14} className="text-purple-500" /> Professional Solver
-                </h2>
-                <button onClick={resetAll} className="text-[10px] font-bold text-slate-600 hover:text-purple-400 transition-colors uppercase tracking-widest">
+      <main className="max-w-6xl mx-auto px-4 md:px-6">
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          {/* Sidebar - Solver Controls */}
+          <aside className="lg:col-span-4 space-y-4">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 relative overflow-hidden">
+
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Hash size={16} className="text-slate-900" />
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">Professional Solver</h3>
+                </div>
+                <button
+                  onClick={resetAll}
+                  className="text-[10px] font-bold text-slate-400 hover:text-purple-600 uppercase tracking-widest transition-colors"
+                >
                   Reset
                 </button>
               </div>
 
-              <div className="space-y-4 mb-10">
+              {/* Letter Positions */}
+              <div className="space-y-3 mb-8">
                 <div className="flex items-center justify-between px-1">
-                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Letter Positions</p>
-                   <Info size={12} className="text-slate-700" title="Corresponds to Green boxes in Wordle" />
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Letter Positions</label>
+                  <Info size={12} className="text-slate-300" />
                 </div>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   {knownPos.map((val, i) => (
                     <input
                       key={i}
                       id={`grid-${i}`}
                       type="text"
+                      maxLength={1}
+                      autoComplete="off"
                       value={val}
                       onChange={(e) => handleGridChange(i, e.target.value)}
-                      className={`w-full aspect-square text-center text-xl md:text-2xl font-black rounded-xl md:rounded-2xl border-2 transition-all outline-none shadow-inner cursor-text
-                        ${val ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'bg-slate-950 border-slate-800 text-white focus:border-purple-500'}`}
-                      placeholder={(i+1).toString()}
+                      className={`aspect-square text-center text-2xl font-bold rounded-xl border-2 transition-all outline-none shadow-sm
+                        ${val ? 'bg-purple-50 border-purple-500 text-purple-700' : 'bg-white border-slate-200 text-slate-700 focus:border-purple-400 focus:ring-4 focus:ring-purple-50'}`}
+                      placeholder={(i + 1).toString()}
                     />
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-6">
+              {/* Input Fields */}
+              <div className="space-y-4 mb-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Include</label>
-                  <input type="text" value={includeLetters} onChange={(e) => setIncludeLetters(e.target.value)} placeholder="e.g. A, E (Yellow)" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-purple-500 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" />
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Must Include</label>
+                  <input
+                    type="text"
+                    value={includeLetters}
+                    onChange={(e) => setIncludeLetters(e.target.value)}
+                    placeholder="e.g. A, E (Yellow)"
+                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-medium outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 text-slate-900 placeholder:text-slate-400 transition-all shadow-sm"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Must Exclude</label>
-                  <input type="text" value={excludeLetters} onChange={(e) => setExcludeLetters(e.target.value)} placeholder="e.g. X, Q (Grey)" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-red-900 text-white placeholder:text-slate-800 transition-all shadow-inner cursor-text" />
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Must Exclude</label>
+                  <input
+                    type="text"
+                    value={excludeLetters}
+                    onChange={(e) => setExcludeLetters(e.target.value)}
+                    placeholder="e.g. X, Q (Grey)"
+                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-medium outline-none focus:border-red-400 focus:ring-4 focus:ring-red-50 text-slate-900 placeholder:text-slate-400 transition-all shadow-sm"
+                  />
                 </div>
               </div>
 
-              <div className="mt-10 pt-8 border-t border-slate-800">
-                <div onClick={() => setCommonOnly(!commonOnly)} className="flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800 rounded-2xl cursor-pointer hover:border-purple-500/30 transition-all shadow-inner">
-                  <div className="flex items-center gap-2">
-                    <Star size={14} className={commonOnly ? "text-yellow-500 fill-yellow-500" : "text-slate-700"} />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Common Only</span>
+              {/* Common Only Toggle */}
+              <div className="pt-6 border-t border-slate-100">
+                <button onClick={() => setCommonOnly(!commonOnly)} className="w-full flex items-center justify-between p-2 rounded-lg group">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-yellow-50 rounded-md text-yellow-500">
+                      <Star size={14} className="fill-yellow-500" />
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider group-hover:text-slate-900 transition-colors">Common Only</span>
                   </div>
-                  <div className={`w-8 h-4 rounded-full relative transition-colors ${commonOnly ? 'bg-purple-600' : 'bg-slate-800'}`}>
-                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${commonOnly ? 'left-4.5' : 'left-0.5'}`} />
+                  <div className={`w-10 h-6 rounded-full relative transition-all duration-300 ${commonOnly ? 'bg-purple-600' : 'bg-slate-200'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 ${commonOnly ? 'left-5' : 'left-1'}`} />
                   </div>
-                </div>
+                </button>
               </div>
             </div>
           </aside>
 
+          {/* Main Column - Search & Results */}
           <section className="lg:col-span-8 space-y-6">
+
+            {/* Search Bar */}
             <div className="relative group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-purple-500 transition-colors" size={24} />
-              <input type="text" placeholder="Search dictionary..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#0f172a] border border-slate-800 rounded-[2rem] md:rounded-[2.5rem] py-6 pl-16 pr-8 outline-none focus:border-purple-500 text-xl md:text-2xl font-medium text-white shadow-2xl transition-all placeholder:text-slate-800 cursor-text" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors" size={20} />
+              <input
+                type="text"
+                placeholder="Search dictionary..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-50 text-lg font-medium text-slate-800 shadow-md hover:shadow-lg transition-all placeholder:text-slate-300 placeholder:font-light"
+              />
             </div>
-            
-            <div className="bg-[#0f172a]/30 border border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 min-h-[500px] backdrop-blur-md relative shadow-2xl overflow-hidden cursor-default">
-              <div className="flex items-center justify-between mb-8 border-b border-slate-800/50 pb-8">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-[0.4em]">
-                    {filteredWords.length} Matches
-                  </span>
-                  {filteredWords.length > displayLimit && (
-                    <span className="text-[9px] md:text-[10px] font-bold text-purple-400/60 uppercase tracking-widest">
-                      Showing top {displayLimit}. Use filters to narrow.
-                    </span>
-                  )}
+
+            {/* Results Card */}
+            <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-xl min-h-[500px] relative">
+
+              {/* Results Header */}
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+                <div className="space-y-1">
+                  <h4 className="text-base font-black text-slate-800 uppercase tracking-wider">
+                    {filteredWords.length.toLocaleString()} Matches
+                  </h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {filteredWords.length > displayLimit ? `Showing top ${displayLimit}. Use filters to narrow.` : 'All matches shown.'}
+                  </p>
                 </div>
-                <div className="flex gap-1.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse delay-75" />
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-300" />
                 </div>
               </div>
-              
+
+              {/* Word Grid */}
               {filteredWords.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                     {filteredWords.slice(0, displayLimit).map(word => (
-                      <button key={word} onClick={() => copyToClipboard(word)} className="p-4 md:p-6 bg-slate-900/60 hover:bg-purple-600/10 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-center transition-all group relative active:scale-95 overflow-hidden shadow-lg cursor-pointer">
-                        <span className="font-mono font-black uppercase tracking-[0.3em] text-sm md:text-lg text-slate-400 group-hover:text-white transition-colors">{word}</span>
-                        <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 transition-all duration-300 ${copiedWord === word ? 'opacity-100' : 'opacity-0'}`}><Check size={20} className="text-white" /></div>
+                      <button
+                        key={word}
+                        onClick={() => copyToClipboard(word)}
+                        className="group relative h-12 bg-white border-2 border-slate-100 hover:border-purple-500 hover:shadow-md rounded-xl transition-all duration-200 overflow-hidden flex items-center justify-center active:scale-95"
+                      >
+                        <span className="font-bold text-sm text-slate-700 tracking-widest uppercase group-hover:text-purple-700 transition-colors">
+                          {word}
+                        </span>
+                        <div className={`absolute inset-0 flex items-center justify-center bg-purple-600 text-white transition-all duration-200 ${copiedWord === word ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                          <Check size={16} strokeWidth={3} />
+                        </div>
                       </button>
                     ))}
                   </div>
+
                   {filteredWords.length > displayLimit && (
-                    <div className="mt-12 flex justify-center pb-8">
-                      <button onClick={() => setDisplayLimit(prev => prev + 50)} className="px-8 py-4 bg-slate-900/50 border border-slate-800 hover:border-purple-500/50 rounded-2xl text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-[0.3em] transition-all flex items-center gap-3 group">
+                    <div className="mt-10 flex justify-center">
+                      <button
+                        onClick={() => setDisplayLimit(prev => prev + 100)}
+                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-purple-200 transition-all flex items-center gap-2 group"
+                      >
                         Show More <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
                       </button>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center py-40">
-                  <X size={48} className="text-slate-800 mb-4" />
-                  <p className="font-black uppercase tracking-[0.4em] text-slate-800">No matches</p>
+                <div className="flex flex-col items-center justify-center py-24 opacity-40">
+                  <div className="p-4 bg-slate-50 rounded-full mb-4">
+                    <Search size={32} className="text-slate-300" />
+                  </div>
+                  <p className="font-bold uppercase tracking-widest text-slate-400 text-sm">No matches found</p>
                 </div>
               )}
             </div>
 
-            <div className="mt-8 md:mt-12 bg-slate-950/20 border border-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 select-none">
-              <p className="text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] mb-6 md:mb-8 text-center sm:text-left">Dictionary Index</p>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+            {/* Dictionary Index */}
+            <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-lg">
+              <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest mb-6">Dictionary Index</p>
+              <div className="flex flex-wrap gap-2">
                 {alphabet.map((char) => (
-                  <a key={char} href={`/starting-with/${char}`} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-[10px] md:text-xs font-bold text-slate-500 hover:border-purple-500 hover:text-white transition-all uppercase cursor-pointer">
+                  <a key={char} href={`/starting-with/${char}`} className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-500 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all uppercase cursor-pointer">
                     {char}
                   </a>
                 ))}
               </div>
             </div>
+
           </section>
         </div>
+
+        {/* --- SEO CONTENT SECTIONS --- */}
+        <article className="mt-24 border-t border-slate-200 pt-16 max-w-3xl mx-auto select-none space-y-12">
+
+          {/* Header */}
+          <header className="text-center space-y-6 mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+              Five Letter <span className="text-purple-600">Word Finder</span>
+            </h2>
+          </header>
+
+          <div className="prose prose-slate prose-lg max-w-none">
+            <p className="text-slate-600 leading-relaxed font-medium text-lg">
+              Our 5 Letter Word Finder helps you solve Wordle puzzles by showing all possible words that match your clues. Enter the letters you know, the letters you've ruled out, and we'll instantly narrow down the possibilities.
+            </p>
+            <p className="text-slate-600 leading-relaxed">
+              Our word finder is designed to help you solve puzzles, not do them for you. We only show the possible words remaining in your Wordle grid, not spoil the actual answer (unless of course if there's only one possible word left).
+            </p>
+            <p className="text-slate-600 leading-relaxed">
+              The tool works by filtering through thousands of five letter words based on your criteria. You can enter letters in certain positions (green tiles), have letters in the wrong spots (yellow tiles), or exclude letters entirely (gray tiles). Words that are common Wordle answers appear in bold to help you make the best guess.
+            </p>
+            <p className="text-slate-600 leading-relaxed">
+              Beyond Wordle, you can use our finder to unscramble letters, search by starting or ending letters, or improve your performance in Scrabble, Words With Friends, and other word games.
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Using Five Letter Word Finder as a Wordle Solver</h3>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Our word finder tool has three filters:
+            </p>
+            <ul className="space-y-4 list-none pl-0">
+              <li className="bg-green-50 p-4 rounded-xl border border-green-100">
+                <strong className="text-green-800 text-sm uppercase tracking-wide block mb-1">Known Letters (Green)</strong>
+                <span className="text-slate-600 text-sm">Enter the letters that you already know are in the word at specific positions. For example, if you know that the word starts with "CA" and ends with "T", you would enter "C" in the first box, "A" in the second box, and "T" in the last box.</span>
+              </li>
+              <li className="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                <strong className="text-yellow-700 text-sm uppercase tracking-wide block mb-1">Include Letters (Yellow)</strong>
+                <span className="text-slate-600 text-sm">Enter the letters that you know are in the word but don't know where they are. For example, if you know that the word contains the letters "A" and "T", but you don't know where they are, you would enter "A" and "T" in the "Include Letters" (Yellow) field.</span>
+              </li>
+              <li className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <strong className="text-slate-700 text-sm uppercase tracking-wide block mb-1">Exclude Letters (Gray)</strong>
+                <span className="text-slate-600 text-sm">Enter the letters that you know are not in the word. For example, if you know that the word does not contain the letters "X" or "Y", you would enter "X" and "Y" in the "Exclude Letters" (Gray) field.</span>
+              </li>
+            </ul>
+            <p className="text-slate-600 leading-relaxed mt-6">
+              After entering your letters into the appropriate fields, click the "Find Words" button to find 5 letter words with these letters. Words that are common and more likely to be Wordle solutions are shown in bold.
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Using Five Letter Word Finder as a 5 Letter Word Unscrambler</h3>
+            <p className="text-slate-600 leading-relaxed">
+              To unscramble 5 letters into words, simply enter the letters you want to unscramble into the "Include Letters" (Yellow) field and leave the other fields empty. Our tool will generate a list of all possible words that can be made from those letters. For example, here is the list of 12 words that can be formed from the letters A, E, L, S, T, including "LEAST", "SLATE", "STALE", and "STEAL".
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Finding 5 Letter Words by Position</h3>
+            <p className="text-slate-600 leading-relaxed">
+              If you know the position of certain letters in the word, you can use our tool to find words that match those positions. For example, if you know that the first letter in the word is "C", the third letter is "A" and the last letter is "N", you can enter "C" in the first green box, "A" in the third, and "N" in the 5th (last) green box. Press "Find Words" and you'll find the word you're looking for (in this case, "CHAIN" is the only word that matches this criteria).
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Wordle Strategy Tips</h3>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              Some proven strategies to improve your Wordle game:
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-slate-600 marker:text-purple-500">
+              <li>Start with vowel-rich words like "ADIEU" or "AUDIO" to quickly identify which vowels are in the puzzle.</li>
+              <li>Use common consonants early such as L, N, R, S, and T to maximize the information from your first guesses.</li>
+              <li>Pay attention to letter frequency - letters like A, E, I, O, R appear most often in five-letter words.</li>
+              <li>Eliminate possibilities systematically by using the Exclude Letters (Gray) field to track letters you've ruled out.</li>
+              <li>Consider word patterns - many English words follow common patterns like consonant-vowel-consonant-vowel-consonant (CVCVC).</li>
+            </ul>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Sharing Search Results</h3>
+            <p className="text-slate-600 leading-relaxed">
+              Our word finder tool allows you to save your search results for future reference or sharing. When you click the "Find Words" button, you will be redirected to a page that specifically shows only your search results. You can then share or bookmark this page for future reference.
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Reporting a Technical Issue</h3>
+            <p className="text-slate-600 leading-relaxed">
+              If you encounter any technical issues with our website, please contact us at info [at] fiveletterwordfinder.com and we will do our best to resolve the issue as soon as possible.
+            </p>
+
+            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Suggesting New Features</h3>
+            <p className="text-slate-600 leading-relaxed">
+              We are always looking for ways to improve our website and make it more useful for our users. If you have any suggestions for new features or improvements, please contact us at info [at] fiveletterwordfinder.com.
+            </p>
+          </div>
+
+        </article>
       </main>
+      <footer className="py-6 border-t border-slate-200 text-center bg-white mt-12">
+        <div className="flex items-center justify-center gap-2 mb-4 opacity-400">
+          <Zap size={10} className="text-purple-600 fill-purple-600" />
+          <span className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-900 italic">WordPulse Studio</span>
+        </div>
+        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em]">Designed for Performance • Built for Word Games • © 2026</p>
+      </footer>
     </div>
   );
 }
