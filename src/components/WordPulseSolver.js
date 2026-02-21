@@ -4,14 +4,14 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown, ShieldCheck, Lightbulb, HelpCircle, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "", "", ""], showBackToHome = false }) {
+export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "", "", ""], showBackToHome = false, pageTitle = "Professional 5-Letter Word Finder", initialDisplayLimit = 25 }) {
     const [knownPos, setKnownPos] = useState(initialKnownPos);
     const [includeLetters, setIncludeLetters] = useState("");
     const [excludeLetters, setExcludeLetters] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [commonOnly, setCommonOnly] = useState(true);
     const [copiedWord, setCopiedWord] = useState(null);
-    const [displayLimit, setDisplayLimit] = useState(25);
+    const [displayLimit, setDisplayLimit] = useState(initialDisplayLimit);
 
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
     const allWords = wordData?.allWords || [];
@@ -83,7 +83,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                         <div className="p-1.5 bg-slate-900 rounded-lg shadow-md">
                             <Zap size={16} className="text-white fill-white" />
                         </div>
-                        <h1 className="text-lg font-black text-slate-900 tracking-tighter uppercase italic">WordPulse</h1>
+                        <span className="text-lg font-black text-slate-900 tracking-tighter uppercase italic">5 Letter Words</span>
                     </Link>
                     <div className="hidden md:block">
                         <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
@@ -119,6 +119,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                 </div>
                                 <button
                                     onClick={resetAll}
+                                    aria-label="Reset all filters"
                                     className="text-[10px] font-bold text-slate-400 hover:text-purple-600 uppercase tracking-widest transition-colors"
                                 >
                                     Reset
@@ -139,10 +140,11 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                             type="text"
                                             maxLength={1}
                                             autoComplete="off"
+                                            aria-label={`Known letter position ${i + 1}`}
                                             value={val}
                                             onChange={(e) => handleGridChange(i, e.target.value)}
                                             className={`aspect-square text-center text-2xl font-bold rounded-xl border-2 transition-all outline-none shadow-sm
-                        ${val ? 'bg-purple-50 border-purple-500 text-purple-700' : 'bg-white border-slate-200 text-slate-700 focus:border-purple-400 focus:ring-4 focus:ring-purple-50'}`}
+                                ${val ? 'bg-purple-50 border-purple-500 text-purple-700' : 'bg-white border-slate-200 text-slate-700 focus:border-purple-400 focus:ring-4 focus:ring-purple-50'}`}
                                             placeholder={(i + 1).toString()}
                                         />
                                     ))}
@@ -156,6 +158,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                     <input
                                         type="text"
                                         value={includeLetters}
+                                        aria-label="Must include letters"
                                         onChange={(e) => setIncludeLetters(e.target.value)}
                                         placeholder="e.g. A, E (Yellow)"
                                         className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-medium outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-50 text-slate-900 placeholder:text-slate-400 transition-all shadow-sm"
@@ -166,6 +169,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                     <input
                                         type="text"
                                         value={excludeLetters}
+                                        aria-label="Must exclude letters"
                                         onChange={(e) => setExcludeLetters(e.target.value)}
                                         placeholder="e.g. X, Q (Grey)"
                                         className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-medium outline-none focus:border-red-400 focus:ring-4 focus:ring-red-50 text-slate-900 placeholder:text-slate-400 transition-all shadow-sm"
@@ -175,7 +179,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
 
                             {/* Common Only Toggle */}
                             <div className="pt-6 border-t border-slate-100">
-                                <button onClick={() => setCommonOnly(!commonOnly)} className="w-full flex items-center justify-between p-2 rounded-lg group">
+                                <button aria-label="Toggle common words only" onClick={() => setCommonOnly(!commonOnly)} className="w-full flex items-center justify-between p-2 rounded-lg group">
                                     <div className="flex items-center gap-3">
                                         <div className="p-1.5 bg-yellow-50 rounded-md text-yellow-500">
                                             <Star size={14} className="fill-yellow-500" />
@@ -199,6 +203,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                             <input
                                 type="text"
                                 placeholder="Search dictionary..."
+                                aria-label="Search dictionary"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-50 text-lg font-medium text-slate-800 shadow-md hover:shadow-lg transition-all placeholder:text-slate-300 placeholder:font-light"
@@ -211,12 +216,17 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                             {/* Results Header */}
                             <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                                 <div className="space-y-1">
-                                    <h4 className="text-base font-black text-slate-800 uppercase tracking-wider">
-                                        {filteredWords.length.toLocaleString()} Matches
-                                    </h4>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                        {filteredWords.length > displayLimit ? `Showing top ${displayLimit}. Use filters to narrow.` : 'All matches shown.'}
-                                    </p>
+                                    <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight italic">
+                                        {pageTitle}
+                                    </h1>
+                                    <div className="flex items-center gap-4 mt-2">
+                                        <div className="text-sm font-bold text-slate-600 uppercase tracking-wider">
+                                            {filteredWords.length.toLocaleString()} Matches Found
+                                        </div>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-l border-slate-200 pl-4">
+                                            {filteredWords.length > displayLimit ? `Showing top ${displayLimit}` : 'All matches shown'}
+                                        </p>
+                                    </div>
                                 </div>
                                 <div className="flex gap-1">
                                     <div className="w-1.5 h-1.5 rounded-full bg-purple-600" />
@@ -231,6 +241,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                         {filteredWords.slice(0, displayLimit).map(word => (
                                             <button
                                                 key={word}
+                                                aria-label={`Copy word ${word}`}
                                                 onClick={() => copyToClipboard(word)}
                                                 className="group relative h-12 bg-white border-2 border-slate-100 hover:border-purple-500 hover:shadow-md rounded-xl transition-all duration-200 overflow-hidden flex items-center justify-center active:scale-95"
                                             >
@@ -281,65 +292,12 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                 </div>
 
                 {/* --- SEO CONTENT SECTIONS --- */}
-                <article className="mt-24 border-t border-slate-200 pt-16 max-w-4xl mx-auto select-none">
-                    <header className="mb-16 text-center">
-                        <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 tracking-tighter uppercase italic leading-[0.9]">
-                            Dominating the <span className="text-purple-600">5-Letter</span> Landscape
-                        </h2>
-                        <p className="text-slate-500 leading-relaxed text-base font-medium max-w-2xl mx-auto">
-                            WordPulse is more than just a list of words; it's a strategic layer for enthusiasts. We help you eliminate billions of impossible combinations in milliseconds using advanced pattern matching.
-                        </p>
-                    </header>
-
-                    <div className="grid md:grid-cols-2 gap-8 mb-16">
-                        <div className="p-8 bg-white border border-slate-200 rounded-3xl space-y-4 hover:border-purple-200 transition-all shadow-sm">
-                            <div className="flex items-center gap-3 text-purple-600">
-                                <Lightbulb size={24} />
-                                <h3 className="text-base font-black text-slate-900 uppercase tracking-wider italic">Start Strategically</h3>
-                            </div>
-                            <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                                Statistical analysis suggests that words like <strong>CRANE</strong> or <strong>ADIEU</strong> are the most efficient starters because they contain high-frequency letters used in over 60% of modern solutions.
-                            </p>
-                        </div>
-                        <div className="p-8 bg-white border border-slate-200 rounded-3xl space-y-4 hover:border-purple-200 transition-all shadow-sm">
-                            <div className="flex items-center gap-3 text-purple-600">
-                                <HelpCircle size={24} />
-                                <h3 className="text-base font-black text-slate-900 uppercase tracking-wider italic">Understand Yellows</h3>
-                            </div>
-                            <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                                When a letter is yellow, it exists in the word but is in the wrong spot. Use our "Must Include" field to see all words containing that specific character to narrow down your next move.
-                            </p>
-                        </div>
-                    </div>
-
-                    <section className="bg-slate-900 rounded-[2.5rem] p-10 md:p-12 shadow-2xl relative overflow-hidden">
-                        {/* Abstract Decor */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/20 blur-[80px] rounded-full pointer-events-none" />
-
-                        <h2 className="text-2xl font-black text-white mb-8 uppercase tracking-widest italic border-b border-white/10 pb-6 relative z-10">Solver FAQ</h2>
-                        <div className="grid md:grid-cols-2 gap-12 relative z-10">
-                            <div className="space-y-8">
-                                <div className="group">
-                                    <h4 className="text-purple-400 font-black uppercase tracking-wider mb-2 text-[10px] italic">How comprehensive is the dictionary?</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Our database contains over 12,000 verified five-letter words, including the original solution list used in modern daily word games across the web.</p>
-                                </div>
-                                <div className="group">
-                                    <h4 className="text-purple-400 font-black uppercase tracking-wider mb-2 text-[10px] italic">Is WordPulse updated for 2026?</h4>
-                                    <p className="text-slate-400 text-xs leading-relaxed">Yes. We constantly sync with the latest game updates to ensure rare plurals and obscure scientific terms are accurately categorized every single day.</p>
-                                </div>
-                            </div>
-                            <div className="hidden md:flex items-center justify-center opacity-20 pointer-events-none italic uppercase font-black text-5xl leading-[0.8] select-none text-white text-right">
-                                Word <br /> Pulse <br /> Logic
-                            </div>
-                        </div>
-                    </section>
-                </article>
             </main>
 
             <footer className="py-12 border-t border-slate-200 text-center bg-white mt-20">
                 <div className="flex items-center justify-center gap-2 mb-4 opacity-40">
                     <Zap size={14} className="text-purple-600 fill-purple-600" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-900 italic">WordPulse Studio</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-900 italic">5 Letter Words Studio</span>
                 </div>
                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em]">Designed for Performance • Built for Word Games • © 2026</p>
             </footer>

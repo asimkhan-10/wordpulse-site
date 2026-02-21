@@ -4,8 +4,7 @@
  */
 
 export default async function sitemap() {
-  // Replace this with your actual domain when you deploy (e.g., https://wordpulse.com)
-  const baseUrl = 'https://wordpulse-site.vercel.app'; 
+  const baseUrl = 'https://5letterwords.me';
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
   // 1. Home page entry
