@@ -376,7 +376,7 @@ export default function App() {
 
               <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Suggesting New Features</h3>
               <p className="text-slate-600 leading-relaxed">
-                We are always looking for ways to improve our website and make it more useful for our users. If you have any suggestions for new features or improvements, please contact us at info [at] fiveletterwordfinder.com.
+                We are always looking for ways to improve our website and make it more useful for our users. If you have any suggestions for new features or improvements, please contact us at 5letterwords.me.
               </p>
             </div>
 
