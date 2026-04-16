@@ -1,14 +1,22 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, X, Zap, Star, RotateCcw, Info, Hash, ChevronDown, ShieldCheck, Lightbulb, HelpCircle, ChevronLeft } from 'lucide-react';
+import { Search, Check, Zap, Star, Info, Hash, ChevronDown, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import SiteNav from '@/components/SiteNav';
+import SiteFooter from '@/components/SiteFooter';
 
 export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "", "", ""], showBackToHome = false, pageTitle = "Professional 5-Letter Word Finder", initialDisplayLimit = 25 }) {
+    // Pending (user is typing)
     const [knownPos, setKnownPos] = useState(initialKnownPos);
     const [includeLetters, setIncludeLetters] = useState("");
     const [excludeLetters, setExcludeLetters] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
+
+    // Committed (applied after clicking Find Words)
+    const [committedKnownPos, setCommittedKnownPos] = useState(initialKnownPos);
+    const [committedInclude, setCommittedInclude] = useState("");
+    const [committedExclude, setCommittedExclude] = useState("");
+
     const [commonOnly, setCommonOnly] = useState(true);
     const [copiedWord, setCopiedWord] = useState(null);
     const [displayLimit, setDisplayLimit] = useState(initialDisplayLimit);
@@ -19,7 +27,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
 
     useEffect(() => {
         setDisplayLimit(25);
-    }, [knownPos, includeLetters, excludeLetters, searchTerm, commonOnly]);
+    }, [committedKnownPos, committedInclude, committedExclude, commonOnly]);
 
     const filteredWords = useMemo(() => {
         const source = commonOnly ? commonWords : allWords;
@@ -28,20 +36,19 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
         return source.filter(word => {
             const w = word.toLowerCase();
             for (let i = 0; i < 5; i++) {
-                if (knownPos[i] && w[i] !== knownPos[i].toLowerCase()) return false;
+                if (committedKnownPos[i] && w[i] !== committedKnownPos[i].toLowerCase()) return false;
             }
-            if (includeLetters) {
-                const letters = includeLetters.toLowerCase().split(/[\s,]+/).filter(Boolean);
+            if (committedInclude) {
+                const letters = committedInclude.toLowerCase().split(/[\s,]+/).filter(Boolean);
                 if (!letters.every(char => w.includes(char))) return false;
             }
-            if (excludeLetters) {
-                const letters = excludeLetters.toLowerCase().split(/[\s,]+/).filter(Boolean);
+            if (committedExclude) {
+                const letters = committedExclude.toLowerCase().split(/[\s,]+/).filter(Boolean);
                 if (letters.some(char => w.includes(char))) return false;
             }
-            if (searchTerm && !w.includes(searchTerm.toLowerCase())) return false;
             return true;
         });
-    }, [knownPos, includeLetters, excludeLetters, searchTerm, commonOnly, allWords, commonWords]);
+    }, [committedKnownPos, committedInclude, committedExclude, commonOnly, allWords, commonWords]);
 
     const handleGridChange = (index, value) => {
         const newPos = [...knownPos];
@@ -66,32 +73,27 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
         }
     };
 
+    const findWords = () => {
+        setCommittedKnownPos([...knownPos]);
+        setCommittedInclude(includeLetters);
+        setCommittedExclude(excludeLetters);
+    };
+
     const resetAll = () => {
-        setKnownPos(["", "", "", "", ""]);
+        const empty = ["", "", "", "", ""];
+        setKnownPos(empty);
         setIncludeLetters("");
         setExcludeLetters("");
-        setSearchTerm("");
+        setCommittedKnownPos(empty);
+        setCommittedInclude("");
+        setCommittedExclude("");
     };
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900 pb-20">
 
             {/* Navigation */}
-            <nav className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-3 mb-8">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="p-1.5 bg-slate-900 rounded-lg shadow-md">
-                            <Zap size={16} className="text-white fill-white" />
-                        </div>
-                        <span className="text-lg font-black text-slate-900 tracking-tighter uppercase italic">5 Letter Words</span>
-                    </Link>
-                    <div className="hidden md:block">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
-                            Database: {allWords.length.toLocaleString()} Words
-                        </span>
-                    </div>
-                </div>
-            </nav>
+            <SiteNav />
 
             <main className="max-w-6xl mx-auto px-4 md:px-6">
 
@@ -109,7 +111,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
 
                     {/* Sidebar - Solver Controls */}
                     <aside className="lg:col-span-4 space-y-4">
-                        <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 relative overflow-hidden">
+                        <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 relative">
 
                             {/* Header */}
                             <div className="flex items-center justify-between mb-6">
@@ -191,24 +193,24 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                                     </div>
                                 </button>
                             </div>
+
+                            {/* Find Words Button */}
+                            <div className="pt-4">
+                                <button
+                                    id="find-words-btn"
+                                    aria-label="Find Words"
+                                    onClick={findWords}
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-slate-900 hover:bg-purple-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg transition-all duration-200 active:scale-95 group"
+                                >
+                                    <Search size={14} className="group-hover:scale-110 transition-transform" />
+                                    Find Words
+                                </button>
+                            </div>
                         </div>
                     </aside>
 
-                    {/* Main Column - Search & Results */}
+                    {/* Main Column - Results */}
                     <section className="lg:col-span-8 space-y-6">
-
-                        {/* Search Bar */}
-                        <div className="relative group">
-                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Search dictionary..."
-                                aria-label="Search dictionary"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-14 pr-6 outline-none focus:border-purple-300 focus:ring-4 focus:ring-purple-50 text-lg font-medium text-slate-800 shadow-md hover:shadow-lg transition-all placeholder:text-slate-300 placeholder:font-light"
-                            />
-                        </div>
 
                         {/* Results Card */}
                         <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-xl min-h-[500px] relative">
@@ -294,13 +296,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                 {/* --- SEO CONTENT SECTIONS --- */}
             </main>
 
-            <footer className="py-12 border-t border-slate-200 text-center bg-white mt-20">
-                <div className="flex items-center justify-center gap-2 mb-4 opacity-40">
-                    <Zap size={14} className="text-purple-600 fill-purple-600" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.6em] text-slate-900 italic">5 Letter Words Studio</span>
-                </div>
-                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em]">Designed for Performance • Built for Word Games • © 2026</p>
-            </footer>
+            <SiteFooter />
         </div>
     );
 }
