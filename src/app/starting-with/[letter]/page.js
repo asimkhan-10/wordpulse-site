@@ -2,6 +2,7 @@ import React from 'react';
 import WordPulseSolver from '@/components/WordPulseSolver';
 import wordData from '../../data/words.json';
 import Link from 'next/link';
+import SiteFooter from '@/components/SiteFooter';
 
 export async function generateStaticParams() {
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -422,6 +423,7 @@ export default async function LetterPage({ params }) {
 
         </article>
       </div>
+      <SiteFooter />
     </>
   );
 }

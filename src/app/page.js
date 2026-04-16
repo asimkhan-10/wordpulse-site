@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import wordDataImport from './data/words.json';
 import WordPulseSolver from '@/components/WordPulseSolver';
+import SiteFooter from '@/components/SiteFooter';
 
 const wordData = wordDataImport || { allWords: [], commonWords: [] };
 
 export default function App() {
   return (
-    <>
+    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -115,6 +116,7 @@ export default function App() {
 
         </article>
       </div>
-    </>
+      <SiteFooter />
+    </div>
   );
 }

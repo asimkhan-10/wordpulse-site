@@ -13,7 +13,7 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900">
 
       <SiteNav activePage="about" />
 

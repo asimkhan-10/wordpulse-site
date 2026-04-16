@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Check, Zap, Star, Info, Hash, ChevronDown, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import SiteNav from '@/components/SiteNav';
-import SiteFooter from '@/components/SiteFooter';
 
 export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "", "", ""], showBackToHome = false, pageTitle = "Professional 5-Letter Word Finder", initialDisplayLimit = 25 }) {
     // Pending (user is typing)
@@ -90,7 +89,7 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900 pb-20">
+        <div className="bg-slate-50 font-sans antialiased text-slate-900">
 
             {/* Navigation */}
             <SiteNav />
@@ -296,7 +295,6 @@ export default function WordPulseSolver({ wordData, initialKnownPos = ["", "", "
                 {/* --- SEO CONTENT SECTIONS --- */}
             </main>
 
-            <SiteFooter />
         </div>
     );
 }
