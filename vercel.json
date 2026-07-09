@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "www.5letterwords.me" }
+      ],
+      "destination": "https://5letterwords.me/:path*",
+      "permanent": true
+    }
+  ]
+}
