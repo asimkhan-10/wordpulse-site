@@ -32,8 +32,8 @@ export default function App() {
 
       {/* --- SEO CONTENT SECTIONS --- */}
       <div className="max-w-3xl mx-auto px-4 md:px-6 pb-20">
-        <article className="mt-24 border-t border-slate-200 pt-16 select-none space-y-12">
-
+        <article className="mt-24 border-t border-slate-200 pt-16 space-y-12">
+        
           <header className="text-center space-y-6 mb-12">
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
               Five Letter <span className="text-purple-600">Word Finder</span>
