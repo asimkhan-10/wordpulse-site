@@ -4,10 +4,10 @@ import SiteNav from '@/components/SiteNav';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata = {
-  title: 'Contact Us - 5 Letter Words',
+  title: 'Contact Us',
   description: 'Get in touch with the 5 Letter Words team. Report a bug, suggest a feature, or just say hello. We read every message.',
   alternates: {
-    canonical: 'https://5letterwords.me/contact',
+    canonical: 'https://www.5letterwords.me/contact',
   },
 };
 

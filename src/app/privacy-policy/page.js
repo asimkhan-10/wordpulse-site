@@ -4,10 +4,10 @@ import SiteNav from '@/components/SiteNav';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata = {
-  title: 'Privacy Policy - 5 Letter Words',
+  title: 'Privacy Policy',
   description: 'Privacy Policy for 5letterwords.me — learn how we collect, use, and protect your data when you use our word finder tool.',
   alternates: {
-    canonical: 'https://5letterwords.me/privacy-policy',
+    canonical: 'https://www.5letterwords.me/privacy-policy',
   },
 };
 
@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-lg font-black text-slate-900 uppercase tracking-wide italic mb-4">1. Introduction</h2>
             <p className="text-slate-600 leading-relaxed">
-              Welcome to 5 Letter Words (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;), accessible at <a href="https://5letterwords.me" className="text-purple-600 hover:underline font-medium">5letterwords.me</a>. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+              Welcome to 5 Letter Words (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;), accessible at <a href="https://www.5letterwords.me" className="text-purple-600 hover:underline font-medium">5letterwords.me</a>. We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
             </p>
             <p className="text-slate-600 leading-relaxed mt-3">
               Please read this policy carefully. If you disagree with its terms, please discontinue use of our site.
@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
               <p className="text-sm font-bold text-slate-700">5 Letter Words</p>
-              <p className="text-sm text-slate-500 mt-1">Website: <a href="https://5letterwords.me" className="text-purple-600 hover:underline">5letterwords.me</a></p>
+              <p className="text-sm text-slate-500 mt-1">Website: <a href="https://www.5letterwords.me" className="text-purple-600 hover:underline">5letterwords.me</a></p>
               <p className="text-sm text-slate-500">Email: <a href="mailto:contact@5letterwords.me" className="text-purple-600 hover:underline">contact@5letterwords.me</a></p>
             </div>
           </section>

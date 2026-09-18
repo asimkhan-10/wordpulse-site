@@ -4,10 +4,10 @@ import SiteNav from '@/components/SiteNav';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata = {
-  title: 'About Us - 5 Letter Words',
+  title: 'About Us',
   description: 'Learn about 5 Letter Words — the professional word finder and Wordle solver tool. Our mission, story, and how we help millions of word game players.',
   alternates: {
-    canonical: 'https://5letterwords.me/about',
+    canonical: 'https://www.5letterwords.me/about',
   },
 };
 

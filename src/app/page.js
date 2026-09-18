@@ -17,7 +17,7 @@ export default function App() {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "5 Letter Words",
-            "url": "https://5letterwords.me",
+            "url": "https://www.5letterwords.me",
             "description": "Professional 5 letter word finder and solver for word games like Wordle.",
             "applicationCategory": "GameApplication",
             "operatingSystem": "All"
@@ -91,9 +91,9 @@ export default function App() {
               Some proven strategies to improve your Wordle game:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-slate-600 marker:text-purple-500">
-              <li>Start with vowel-rich words like &quot;<Link href="/starting-with/A" className="text-purple-600 hover:underline">ADIEU</Link>&quot; or &quot;<Link href="/starting-with/A" className="text-purple-600 hover:underline">AUDIO</Link>&quot; to quickly identify which vowels are in the puzzle.</li>
-              <li>Use common consonants early such as <Link href="/starting-with/L" className="text-purple-600 hover:underline">L</Link>, <Link href="/starting-with/N" className="text-purple-600 hover:underline">N</Link>, <Link href="/starting-with/R" className="text-purple-600 hover:underline">R</Link>, <Link href="/starting-with/S" className="text-purple-600 hover:underline">S</Link>, and <Link href="/starting-with/T" className="text-purple-600 hover:underline">T</Link> to maximize the information from your first guesses.</li>
-              <li>Pay attention to letter frequency - letters like <Link href="/starting-with/A" className="text-purple-600 hover:underline">A</Link>, <Link href="/starting-with/E" className="text-purple-600 hover:underline">E</Link>, I, O, R appear most often in five-letter words.</li>
+              <li>Start with vowel-rich words like &quot;<Link href="/starting-with/a" className="text-purple-600 hover:underline">ADIEU</Link>&quot; or &quot;<Link href="/starting-with/a" className="text-purple-600 hover:underline">AUDIO</Link>&quot; to quickly identify which vowels are in the puzzle.</li>
+              <li>Use common consonants early such as <Link href="/starting-with/l" className="text-purple-600 hover:underline">L</Link>, <Link href="/starting-with/n" className="text-purple-600 hover:underline">N</Link>, <Link href="/starting-with/r" className="text-purple-600 hover:underline">R</Link>, <Link href="/starting-with/s" className="text-purple-600 hover:underline">S</Link>, and <Link href="/starting-with/t" className="text-purple-600 hover:underline">T</Link> to maximize the information from your first guesses.</li>
+              <li>Pay attention to letter frequency - letters like <Link href="/starting-with/a" className="text-purple-600 hover:underline">A</Link>, <Link href="/starting-with/e" className="text-purple-600 hover:underline">E</Link>, I, O, R appear most often in five-letter words.</li>
               <li>Eliminate possibilities systematically by using the Exclude Letters (Gray) field to track letters you&apos;ve ruled out.</li>
               <li>Consider word patterns - many English words follow common patterns like consonant-vowel-consonant-vowel-consonant (CVCVC).</li>
             </ul>

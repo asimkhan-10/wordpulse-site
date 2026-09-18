@@ -4,7 +4,7 @@
  */
 
 export default async function sitemap() {
-  const baseUrl = 'https://5letterwords.me';
+  const baseUrl = 'https://www.5letterwords.me';
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
   // 1. Home page + static content pages

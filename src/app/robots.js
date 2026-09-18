@@ -6,6 +6,6 @@ export default function robots() {
                 allow: '/',
             },
         ],
-        sitemap: 'https://5letterwords.me/sitemap.xml',
+        sitemap: 'https://www.5letterwords.me/sitemap.xml',
     }
 }

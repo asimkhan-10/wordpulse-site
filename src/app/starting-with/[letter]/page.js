@@ -3,6 +3,7 @@ import WordPulseSolver from '@/components/WordPulseSolver';
 import wordData from '../../data/words.json';
 import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
+import { permanentRedirect } from 'next/navigation';
 
 export async function generateStaticParams() {
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -13,11 +14,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }) {
   const { letter } = await params;
-  const char = letter?.toUpperCase() || '';
-  const url = `https://5letterwords.me/starting-with/${letter}`;
+  const lowerLetter = letter?.toLowerCase() || '';
+  const char = lowerLetter.toUpperCase();
+  const url = `https://www.5letterwords.me/starting-with/${lowerLetter}`;
 
   return {
-    title: `5 Letter Words Starting With ${char} - Complete List | 5 Letter Words`,
+    title: `5 Letter Words Starting With ${char} - Complete List`,
     description: `Browse the complete list of five-letter words starting with ${char}. Filter by letter position, include/exclude letters, and find the perfect word for Wordle, Scrabble, or crosswords.`,
     alternates: {
       canonical: url,
@@ -204,8 +206,12 @@ function getLetterArticle(char, letter, wordCount) {
 
 export default async function LetterPage({ params }) {
   const { letter } = await params;
-  const char = letter?.toUpperCase() || '';
+  if (letter && letter !== letter.toLowerCase()) {
+    permanentRedirect(`/starting-with/${letter.toLowerCase()}`);
+  }
+
   const lowerLetter = letter?.toLowerCase() || '';
+  const char = lowerLetter.toUpperCase();
 
   // Pre-fill first position
   const initialKnownPos = [char, '', '', '', ''];
@@ -236,13 +242,13 @@ export default async function LetterPage({ params }) {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://5letterwords.me"
+                "item": "https://www.5letterwords.me"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": `5-Letter Words Starting With ${char}`,
-                "item": `https://5letterwords.me/starting-with/${letter}`
+                "item": `https://www.5letterwords.me/starting-with/${lowerLetter}`
               }
             ]
           })

@@ -26,14 +26,14 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://5letterwords.me'),
+  metadataBase: new URL('https://www.5letterwords.me'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: "5 Letter Words - Professional Word Finder & Solver",
     description: "Advanced 5-letter word finder for Wordle and word games. Filter by green/yellow/gray positions.",
-    url: 'https://5letterwords.me',
+    url: 'https://www.5letterwords.me',
     siteName: '5 Letter Words',
     locale: 'en_US',
     type: 'website',
