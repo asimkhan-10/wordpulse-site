@@ -54,27 +54,45 @@ export default function App() {
               Beyond Wordle, you can use our finder to unscramble letters, search by starting or ending letters, or improve your performance in Scrabble, Words With Friends, and other word games.
             </p>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Using Five Letter Word Finder as a Wordle Solver</h3>
-            <p className="text-slate-600 leading-relaxed mb-4">
-              Our word finder tool has three filters:
-            </p>
-            <ul className="space-y-4 list-none pl-0">
-              <li className="bg-green-50 p-4 rounded-xl border border-green-100">
-                <strong className="text-green-800 text-sm uppercase tracking-wide block mb-1">Known Letters (Green)</strong>
-                <span className="text-slate-600 text-sm">Enter the letters that you already know are in the word at specific positions. For example, if you know that the word starts with &quot;CA&quot; and ends with &quot;T&quot;, you would enter &quot;C&quot; in the first box, &quot;A&quot; in the second box, and &quot;T&quot; in the last box.</span>
-              </li>
-              <li className="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
-                <strong className="text-yellow-700 text-sm uppercase tracking-wide block mb-1">Include Letters (Yellow)</strong>
-                <span className="text-slate-600 text-sm">Enter the letters that you know are in the word but don&apos;t know where they are. For example, if you know that the word contains the letters &quot;A&quot; and &quot;T&quot;, but you don&apos;t know where they are, you would enter &quot;A&quot; and &quot;T&quot; in the &quot;Include Letters&quot; (Yellow) field.</span>
-              </li>
-              <li className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <strong className="text-slate-700 text-sm uppercase tracking-wide block mb-1">Exclude Letters (Gray)</strong>
-                <span className="text-slate-600 text-sm">Enter the letters that you know are not in the word. For example, if you know that the word does not contain the letters &quot;X&quot; or &quot;Y&quot;, you would enter &quot;X&quot; and &quot;Y&quot; in the &quot;Exclude Letters&quot; (Gray) field.</span>
-              </li>
-            </ul>
-            <p className="text-slate-600 leading-relaxed mt-6">
-              After entering your letters into the appropriate fields, click the &quot;Find Words&quot; button to find 5 letter words with these letters. Words that are common and more likely to be Wordle solutions are shown in bold.
-            </p>
+            <section id="how-to-use" className="scroll-mt-8">
+              <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">How to Use the 5-Letter Word Finder</h3>
+              <p className="text-slate-600 leading-relaxed mb-4">
+                Our word finder tool provides four powerful filters to narrow down any puzzle:
+              </p>
+              <ul className="space-y-4 list-none pl-0">
+                <li className="flex gap-4 items-start bg-green-50 p-4 rounded-xl border border-green-100">
+                  <div className="w-6 h-6 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-green-800 mt-0.5">1</div>
+                  <div>
+                    <strong className="text-green-800 text-sm uppercase tracking-wide block mb-1">Position Slots 1–5 (Known Letters / Green)</strong>
+                    <span className="text-slate-600 text-sm">Enter letters that you already know are in the word at specific positions. For example, if you know the word starts with &quot;CA&quot; and ends with &quot;T&quot;, enter &quot;C&quot; in slot 1, &quot;A&quot; in slot 2, and &quot;T&quot; in slot 5.</span>
+                  </div>
+                </li>
+                <li className="flex gap-4 items-start bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                  <div className="w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-yellow-800 mt-0.5">2</div>
+                  <div>
+                    <strong className="text-yellow-700 text-sm uppercase tracking-wide block mb-1">Must Include Letters (Yellow Tiles)</strong>
+                    <span className="text-slate-600 text-sm">Enter letters that you know are in the word but whose position is unknown (yellow tiles in Wordle).</span>
+                  </div>
+                </li>
+                <li className="flex gap-4 items-start bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-slate-800 mt-0.5">3</div>
+                  <div>
+                    <strong className="text-slate-700 text-sm uppercase tracking-wide block mb-1">Must Exclude Letters (Gray Tiles)</strong>
+                    <span className="text-slate-600 text-sm">Enter letters that you know are not in the word at all (gray tiles in Wordle) to eliminate impossible words.</span>
+                  </div>
+                </li>
+                <li className="flex gap-4 items-start bg-purple-50 p-4 rounded-xl border border-purple-100">
+                  <div className="w-6 h-6 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-purple-800 mt-0.5">4</div>
+                  <div>
+                    <strong className="text-purple-800 text-sm uppercase tracking-wide block mb-1">Common Only Toggle</strong>
+                    <span className="text-slate-600 text-sm">Turn this on to see only the most frequently used words — ideal for Wordle where answers are always common words — or turn it off to explore the full Scrabble dictionary.</span>
+                  </div>
+                </li>
+              </ul>
+              <p className="text-slate-600 leading-relaxed mt-6">
+                After entering your letters, click the &quot;Find Words&quot; button to find 5 letter words with these letters. Words that are common and more likely to be Wordle solutions are shown in bold.
+              </p>
+            </section>
 
             <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Using Five Letter Word Finder as a 5 Letter Word Unscrambler</h3>
             <p className="text-slate-600 leading-relaxed">
@@ -112,6 +130,36 @@ export default function App() {
             <p className="text-slate-600 leading-relaxed">
               We are always looking for ways to improve our website and make it more useful for our users. If you have any suggestions for new features or improvements, please contact us at 5letterwords.me.
             </p>
+
+            {/* Frequently Asked Questions */}
+            <section className="mt-12 pt-8 border-t border-slate-200">
+              <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mb-6">
+                Frequently Asked Questions
+              </h3>
+              <div className="space-y-4">
+                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                    <h4 className="font-bold text-slate-900 text-sm">Can I use this tool for Scrabble?</h4>
+                  </div>
+                  <div className="px-6 py-4">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Absolutely. Toggle off &quot;Common Only&quot; to see the full dictionary including less common words that are still valid in Scrabble. This reveals many high-value words useful for competitive play.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                    <h4 className="font-bold text-slate-900 text-sm">How do I use the Wordle solver?</h4>
+                  </div>
+                  <div className="px-6 py-4">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Type confirmed green letters into their exact position slots (1–5), add yellow letters to &quot;Must Include&quot;, and enter gray letters into &quot;Must Exclude&quot;. The list updates in real time to display every valid remaining word.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
         </article>

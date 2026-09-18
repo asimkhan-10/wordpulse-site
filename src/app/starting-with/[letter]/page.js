@@ -193,6 +193,109 @@ const letterContent = {
   },
 };
 
+const SCRABBLE_SCORES = {
+  a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3,
+  n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
+};
+
+function getWordScore(word) {
+  return [...word.toLowerCase()].reduce((total, char) => total + (SCRABBLE_SCORES[char] || 0), 0);
+}
+
+function getLetterStats(letter, letterWords, allWords = [], commonWords = []) {
+  const char = letter.toUpperCase();
+  const lower = letter.toLowerCase();
+  const total = letterWords.length;
+  const commonSet = new Set((commonWords || []).map(w => w.toLowerCase()));
+  const commonCount = letterWords.filter(w => commonSet.has(w.toLowerCase())).length;
+  const uncommonCount = total - commonCount;
+
+  const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+  const v2Count = letterWords.filter(w => vowels.has(w[1]?.toLowerCase())).length;
+  const v2Pct = total > 0 ? ((v2Count / total) * 100).toFixed(1) : '0.0';
+
+  if (total === 0) {
+    const containing = allWords.filter(w => w.toLowerCase().includes(lower));
+    const examples = containing.slice(0, 3).map(w => w.toUpperCase());
+    return {
+      char,
+      total: 0,
+      commonCount: 0,
+      uncommonCount: 0,
+      v2Pct: '0.0',
+      v2Count: 0,
+      rarestWord: null,
+      distinctiveExamples: [],
+      structuralFact: `No 5-letter words begin with ${char} in the active dictionary; however, ${containing.length} words contain ${char} in positions 2–5 (such as ${examples.join(', ')}).`,
+    };
+  }
+
+  // Find rarest word (prioritizing uncommon entries and highest Scrabble score)
+  const sortedByRarity = [...letterWords].sort((a, b) => {
+    const uncommonA = !commonSet.has(a.toLowerCase());
+    const uncommonB = !commonSet.has(b.toLowerCase());
+    if (uncommonA !== uncommonB) return uncommonA ? -1 : 1;
+    return getWordScore(b) - getWordScore(a);
+  });
+
+  const rarestWord = {
+    word: sortedByRarity[0].toUpperCase(),
+    score: getWordScore(sortedByRarity[0]),
+    isUncommon: !commonSet.has(sortedByRarity[0].toLowerCase()),
+  };
+
+  // Select 2-3 distinctive words from the array (e.g. double letters, high score, or varied patterns)
+  const remaining = sortedByRarity.slice(1);
+  const doubleLetterCandidates = remaining.filter(w => /(\w)\1/.test(w));
+  const distinctive = [];
+
+  if (doubleLetterCandidates.length > 0) {
+    distinctive.push(doubleLetterCandidates[0].toUpperCase());
+  }
+
+  for (const w of remaining) {
+    const upper = w.toUpperCase();
+    if (!distinctive.includes(upper) && upper !== rarestWord.word) {
+      distinctive.push(upper);
+    }
+    if (distinctive.length >= 3) break;
+  }
+
+  // Computed structural fact specific to this letter
+  let structuralFact = '';
+  if (lower === 'q') {
+    const uCount = letterWords.filter(w => w[1]?.toLowerCase() === 'u').length;
+    const uPct = ((uCount / total) * 100).toFixed(1);
+    structuralFact = `${uPct}% of words starting with Q (${uCount} of ${total}) are immediately followed by the letter U.`;
+  } else {
+    const pos2Freq = {};
+    letterWords.forEach(w => {
+      const c = w[1]?.toLowerCase();
+      if (c) pos2Freq[c] = (pos2Freq[c] || 0) + 1;
+    });
+    const sortedPos2 = Object.entries(pos2Freq).sort((a, b) => b[1] - a[1]);
+    const [topChar, topCount] = sortedPos2[0] || ['', 0];
+    const topPct = ((topCount / total) * 100).toFixed(1);
+
+    const doubleWords = letterWords.filter(w => /(\w)\1/.test(w));
+    const doublePct = ((doubleWords.length / total) * 100).toFixed(1);
+
+    structuralFact = `${topPct}% of words (${topCount} of ${total}) feature '${topChar.toUpperCase()}' as their second letter. Furthermore, ${doubleWords.length} words (${doublePct}%) contain repeating letters.`;
+  }
+
+  return {
+    char,
+    total,
+    commonCount,
+    uncommonCount,
+    v2Pct,
+    v2Count,
+    rarestWord,
+    distinctiveExamples: distinctive,
+    structuralFact,
+  };
+}
+
 function getLetterArticle(char, letter, wordCount) {
   const content = letterContent[letter] || {
     intro: `Five-letter words starting with ${char} make up a significant part of the English word game vocabulary. Whether you are playing Wordle, Scrabble, or a crossword puzzle, knowing your ${char}-words gives you a real edge.`,
@@ -223,6 +326,7 @@ export default async function LetterPage({ params }) {
   const letterCommonWords = commonWords.filter(w => w.length === 5 && w[0].toLowerCase() === lowerLetter);
 
   const content = getLetterArticle(char, lowerLetter, letterWords.length);
+  const stats = getLetterStats(lowerLetter, letterWords, allWords, commonWords);
 
   // Dynamic common examples from actual word data (supplement hardcoded ones)
   const exampleWords = letterCommonWords.slice(0, 15);
@@ -276,13 +380,110 @@ export default async function LetterPage({ params }) {
             </p>
             <div className="mt-4 flex flex-wrap gap-3 text-sm">
               <span className="bg-purple-50 border border-purple-100 text-purple-700 font-bold px-3 py-1.5 rounded-full">
-                {letterWords.length.toLocaleString()} total words
+                {stats.total.toLocaleString()} total words
               </span>
               <span className="bg-green-50 border border-green-100 text-green-700 font-bold px-3 py-1.5 rounded-full">
-                {letterCommonWords.length.toLocaleString()} common words
+                {stats.commonCount.toLocaleString()} common words
+              </span>
+              <span className="bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-full">
+                {stats.uncommonCount.toLocaleString()} uncommon words
               </span>
             </div>
           </header>
+
+          {/* Letter Data & Linguistic Insights (Computed Statistics) */}
+          <section className="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 md:p-8 space-y-6">
+            <div className="border-b border-slate-200 pb-4">
+              <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-wide flex items-center gap-2">
+                <span className="w-7 h-7 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
+                  %
+                </span>
+                Data & Pattern Statistics: {char} Words
+              </h3>
+              <p className="text-slate-500 text-xs md:text-sm mt-1">
+                Linguistic distribution and metrics computed dynamically from the active 5-letter dictionary.
+              </p>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Metric 1: Vowel Position 2 */}
+              <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                  2nd-Letter Vowel Rate
+                </span>
+                <div className="text-2xl font-black text-purple-600">
+                  {stats.v2Pct}%
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {stats.v2Count} of {stats.total} words feature a vowel (A, E, I, O, U) in position 2.
+                </p>
+              </div>
+
+              {/* Metric 2: Common vs Uncommon */}
+              <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                  Vocabulary Breakdown
+                </span>
+                <div className="text-2xl font-black text-slate-800">
+                  {stats.commonCount} <span className="text-xs text-slate-400 font-normal">/ {stats.uncommonCount}</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {stats.commonCount} everyday common words vs {stats.uncommonCount} specialized/Scrabble entries.
+                </p>
+              </div>
+
+              {/* Metric 3: Notable Word */}
+              <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                  Highest-Value / Rarest
+                </span>
+                <div className="text-2xl font-black text-emerald-600">
+                  {stats.rarestWord ? stats.rarestWord.word : 'N/A'}
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {stats.rarestWord
+                    ? `Top Scrabble score word (${stats.rarestWord.score} pts) in the ${char} list.`
+                    : `No starting words found in current index.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Computed Insights & Distinctive Examples */}
+            <div className="space-y-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-slate-100">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-1">
+                  Computed Structural Characteristic
+                </h4>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {stats.structuralFact}
+                </p>
+              </div>
+
+              {stats.distinctiveExamples.length > 0 && (
+                <div className="bg-white p-4 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">
+                      Distinctive Vocabulary Sample
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Programmatically selected words with distinctive letter combinations or high Scrabble values.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {stats.distinctiveExamples.map(word => (
+                      <span
+                        key={word}
+                        className="px-3 py-1 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-black tracking-wider rounded-lg uppercase"
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
 
           {/* Common Words Examples */}
           {exampleWords.length > 0 && (
@@ -336,32 +537,20 @@ export default async function LetterPage({ params }) {
             </div>
           </section>
 
-          {/* How to Use */}
-          <section>
-            <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-wide mb-4">
-              How to Use the {char} Word Finder
-            </h3>
-            <p className="text-slate-600 leading-relaxed mb-4">
-              Our tool above already filters to show only five-letter words starting with {char}. You can refine further using:
-            </p>
-            <ul className="space-y-3">
-              <li className="flex gap-3 items-start">
-                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-black text-purple-600">1</div>
-                <p className="text-slate-600 text-sm leading-relaxed"><strong className="text-slate-800">Position slots 2–5:</strong> Click any of the position inputs and type a letter if you know a specific letter at that position. For example, if the word is {char}_A_E_, enter A in position 3 and E in position 5.</p>
-              </li>
-              <li className="flex gap-3 items-start">
-                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-black text-purple-600">2</div>
-                <p className="text-slate-600 text-sm leading-relaxed"><strong className="text-slate-800">Must Include:</strong> Type any letters you know are in the word but whose position is unknown (yellow tiles in Wordle).</p>
-              </li>
-              <li className="flex gap-3 items-start">
-                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-black text-purple-600">3</div>
-                <p className="text-slate-600 text-sm leading-relaxed"><strong className="text-slate-800">Must Exclude:</strong> Type any letters that are not in the word at all (gray tiles in Wordle).</p>
-              </li>
-              <li className="flex gap-3 items-start">
-                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-black text-purple-600">4</div>
-                <p className="text-slate-600 text-sm leading-relaxed"><strong className="text-slate-800">Common Only toggle:</strong> Turn this on to see only the most frequently used words — ideal for Wordle where answers are always common words.</p>
-              </li>
-            </ul>
+          {/* How to Use / Tool Guide Link */}
+          <section className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold text-slate-800 text-sm">Need help using the solver?</h3>
+              <p className="text-slate-500 text-xs mt-0.5">
+                Learn how to combine position filters, green/yellow/gray tiles, and dictionary settings.
+              </p>
+            </div>
+            <Link
+              href="/#how-to-use"
+              className="inline-flex items-center text-sm font-bold text-purple-600 hover:text-purple-700 hover:underline shrink-0"
+            >
+              New to the tool? See how it works →
+            </Link>
           </section>
 
           {/* Other Starting Letters */}
@@ -405,14 +594,6 @@ export default async function LetterPage({ params }) {
                   a: exampleWords.length > 0
                     ? `Some of the most commonly used five-letter words starting with ${char} include: ${exampleWords.slice(0, 5).join(', ')}. These words appear frequently in Wordle, Scrabble, and everyday English.`
                     : `Words starting with ${char} are rarer in English, but they are valuable in Scrabble for their high point potential.`,
-                },
-                {
-                  q: `Can I use this tool for Scrabble?`,
-                  a: `Absolutely. Toggle off "Common Only" to see the full dictionary including less common words that are still valid in Scrabble. This reveals many high-value words useful for competitive play.`,
-                },
-                {
-                  q: `How do I use the Wordle solver for ${char} words?`,
-                  a: `The solver above is pre-filtered for words starting with ${char}. Add any yellow letters to "Must Include", any gray letters to "Must Exclude", and type confirmed letters into their exact position slots. The list updates instantly.`,
                 },
               ].map((faq, i) => (
                 <div key={i} className="border border-slate-100 rounded-2xl overflow-hidden">
