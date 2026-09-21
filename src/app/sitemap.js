@@ -3,6 +3,9 @@
  * This file automatically creates sitemap.xml for Google.
  */
 
+// Fixed date reflecting when site content was last updated for this release
+const LAST_MODIFIED = new Date('2026-09-21');
+
 export default async function sitemap() {
   const baseUrl = 'https://www.5letterwords.me';
   const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -11,25 +14,25 @@ export default async function sitemap() {
   const mainPages = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',
       priority: 0.4,
     },
@@ -38,7 +41,7 @@ export default async function sitemap() {
   // 2. Entries for all 26 SEO Letter pages
   const letterPages = alphabet.map((letter) => ({
     url: `${baseUrl}/starting-with/${letter}`,
-    lastModified: new Date(),
+    lastModified: LAST_MODIFIED,
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
