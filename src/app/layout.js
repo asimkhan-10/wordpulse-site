@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "5 Letter Words - Professional Word Finder & Solver",
+    default: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
     template: "%s | 5 Letter Words"
   },
-  description: "Advanced 5-letter word finder for Wordle and word games. Filter by green/yellow/gray positions, must include/exclude letters, and more.",
+  description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
   keywords: ["wordle solver", "5 letter word finder", "wordle helper", "five letter words", "wordle cheat", "unscramble words"],
   authors: [{ name: "5 Letter Words Studio" }],
   creator: "5 Letter Words Studio",
@@ -31,8 +31,8 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "5 Letter Words - Professional Word Finder & Solver",
-    description: "Advanced 5-letter word finder for Wordle and word games. Filter by green/yellow/gray positions.",
+    title: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+    description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
     url: 'https://www.5letterwords.me',
     siteName: '5 Letter Words',
     locale: 'en_US',
@@ -40,8 +40,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "5 Letter Words - Professional Word Finder & Solver",
-    description: "Advanced 5-letter word finder for Wordle and word games.",
+    title: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+    description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
   },
   robots: {
     index: true,
