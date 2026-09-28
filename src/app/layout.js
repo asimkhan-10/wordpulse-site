@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: {
-    default: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+    default: "5 Letter Word Finder & Solver",
     template: "%s | 5 Letter Words"
   },
   description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
