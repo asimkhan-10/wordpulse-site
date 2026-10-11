@@ -1,6 +1,7 @@
 import React from 'react';
 import WordPulseSolver from '@/components/WordPulseSolver';
 import wordData from '../../data/words.json';
+import letterEditorial from '../../data/letterEditorial.json';
 import Link from 'next/link';
 import SiteFooter from '@/components/SiteFooter';
 import { permanentRedirect } from 'next/navigation';
@@ -327,6 +328,7 @@ export default async function LetterPage({ params }) {
 
   const content = getLetterArticle(char, lowerLetter, letterWords.length);
   const stats = getLetterStats(lowerLetter, letterWords, allWords, commonWords);
+  const editorial = letterEditorial[lowerLetter];
 
   // Dynamic common examples from actual word data (supplement hardcoded ones)
   const exampleWords = letterCommonWords.slice(0, 15);
@@ -391,13 +393,26 @@ export default async function LetterPage({ params }) {
             </div>
           </header>
 
+          {/* Editorial Article Block */}
+          {editorial && (
+            <div className="border-t border-slate-100 pt-8 space-y-5">
+              <p className="text-slate-700 leading-relaxed text-base md:text-lg font-medium">
+                {editorial.intro}
+              </p>
+              <p className="text-purple-900 bg-purple-50/80 border-l-4 border-purple-500 px-4 py-3 rounded-r-xl text-sm md:text-base italic font-medium">
+                {editorial.roadmap}
+              </p>
+              <div className="space-y-4 text-slate-600 text-base leading-relaxed">
+                <p>{editorial.body1}</p>
+                <p>{editorial.body2}</p>
+              </div>
+            </div>
+          )}
+
           {/* Letter Data & Linguistic Insights (Computed Statistics) */}
           <section className="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 md:p-8 space-y-6">
             <div className="border-b border-slate-200 pb-4">
-              <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-wide flex items-center gap-2">
-                <span className="w-7 h-7 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-black">
-                  %
-                </span>
+              <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-wide">
                 Data & Pattern Statistics: {char} Words
               </h3>
               <p className="text-slate-500 text-xs md:text-sm mt-1">

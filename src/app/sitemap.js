@@ -19,6 +19,12 @@ export default async function sitemap() {
       priority: 1,
     },
     {
+      url: `${baseUrl}/wordle-solver`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/about`,
       lastModified: LAST_MODIFIED,
       changeFrequency: 'monthly',

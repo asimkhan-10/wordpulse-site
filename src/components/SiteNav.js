@@ -7,10 +7,11 @@ import { Zap } from 'lucide-react';
  */
 export default function SiteNav({ activePage = '' }) {
   const links = [
-    { href: '/',               label: 'Home',    key: 'home'    },
-    { href: '/about',          label: 'About',   key: 'about'   },
-    { href: '/contact',        label: 'Contact', key: 'contact' },
-    { href: '/privacy-policy', label: 'Privacy', key: 'privacy' },
+    { href: '/',               label: 'Home',          key: 'home'    },
+    { href: '/wordle-solver',  label: 'Wordle Solver', key: 'solver'  },
+    { href: '/about',          label: 'About',         key: 'about'   },
+    { href: '/contact',        label: 'Contact',       key: 'contact' },
+    { href: '/privacy-policy', label: 'Privacy',       key: 'privacy' },
   ];
 
   return (

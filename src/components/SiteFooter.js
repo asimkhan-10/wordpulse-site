@@ -13,6 +13,7 @@ export default function SiteFooter() {
           </div>
           <div className="flex items-center gap-6">
             <Link href="/"               className="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">Home</Link>
+            <Link href="/wordle-solver"  className="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">Wordle Solver</Link>
             <Link href="/about"          className="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">About</Link>
             <Link href="/contact"        className="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">Contact</Link>
             <Link href="/privacy-policy" className="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest transition-colors">Privacy Policy</Link>

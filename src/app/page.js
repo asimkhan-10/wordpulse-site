@@ -1,13 +1,60 @@
-"use client";
-
 import Link from 'next/link';
+import Image from 'next/image';
 import wordDataImport from './data/words.json';
 import WordPulseSolver from '@/components/WordPulseSolver';
 import SiteFooter from '@/components/SiteFooter';
 
 const wordData = wordDataImport || { allWords: [], commonWords: [] };
 
+export const metadata = {
+  title: {
+    absolute: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+  },
+  description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
+  alternates: {
+    canonical: 'https://www.5letterwords.me',
+  },
+  openGraph: {
+    title: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+    description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
+    url: 'https://www.5letterwords.me',
+    siteName: '5 Letter Words',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "5 Letter Word Finder & Solver for Wordle, Scrabble & Word Games",
+    description: "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
+  },
+};
+
 export default function App() {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+  const faqData = [
+    {
+      question: "Is this 5 letter word finder really free?",
+      answer: "Yes. Every filter, the full dictionary toggle, and unlimited searches cost nothing, and there's no account to create."
+    },
+    {
+      question: "Does it work on mobile phones?",
+      answer: "It was built for it. The layout is thumb-friendly, so players can run the finder in their phone browser right alongside the Wordle app."
+    },
+    {
+      question: "Can it reveal today's Wordle answer?",
+      answer: "Not directly — and that's by design. The finder won't hand over the wordle answer today on a platter; it narrows thousands of candidates to the few that fit the clues entered. The final guess is still the player's. It also doesn't track past wordle answers, since Wordle never repeats one."
+    },
+    {
+      question: "What dictionary does it search?",
+      answer: "A curated list of over 2,300 common five-letter words with the Common Only toggle on, expanding to the full Scrabble-style dictionary — 6,000+ entries — when it's toggled off. That makes it a true 5 letter solver for both casual puzzles and serious word games."
+    },
+    {
+      question: "Is it only for Wordle?",
+      answer: "No. Crossword fills, Scrabble checks, anagram unscrambling, vocabulary building — if the word has five letters, the finder earns its keep."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900">
       <script
@@ -15,12 +62,27 @@ export default function App() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "5 Letter Words",
-            "url": "https://www.5letterwords.me",
-            "description": "Professional 5 letter word finder and solver for word games like Wordle.",
-            "applicationCategory": "GameApplication",
-            "operatingSystem": "All"
+            "@graph": [
+              {
+                "@type": "WebApplication",
+                "name": "5 Letter Word Finder",
+                "url": "https://www.5letterwords.me",
+                "description": "Free 5 letter word finder and solver for Wordle, Scrabble, and Words With Friends. Filter by letter position, include, and exclude to find every matching word instantly.",
+                "applicationCategory": "GameApplication",
+                "operatingSystem": "All"
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": faqData.map((item) => ({
+                  "@type": "Question",
+                  "name": item.question,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": item.answer
+                  }
+                }))
+              }
+            ]
           })
         }}
       />
@@ -36,128 +98,334 @@ export default function App() {
         
           <header className="text-center space-y-6 mb-12">
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
-              Five Letter <span className="text-purple-600">Word Finder</span>
+              5 Letter <span className="text-purple-600">Word Finder</span>
             </h1>
           </header>
 
           <div className="prose prose-slate prose-lg max-w-none">
+            {/* Introduction */}
             <p className="text-slate-600 leading-relaxed font-medium text-lg">
-              Our 5 Letter Word Finder helps you solve Wordle puzzles by showing all possible words that match your clues. Enter the letters you know, the letters you've ruled out, and we'll instantly narrow down the possibilities.
-            </p>
-            <p className="text-slate-600 leading-relaxed">
-              Our word finder is designed to help you solve puzzles, not do them for you. We only show the possible words remaining in your Wordle grid, not spoil the actual answer (unless of course if there's only one possible word left).
-            </p>
-            <p className="text-slate-600 leading-relaxed">
-              The tool works by filtering through thousands of five letter words based on your criteria. You can enter letters in certain positions (green tiles), have letters in the wrong spots (yellow tiles), or exclude letters entirely (gray tiles). Words that are common Wordle answers appear in bold to help you make the best guess.
-            </p>
-            <p className="text-slate-600 leading-relaxed">
-              Beyond Wordle, you can use our finder to unscramble letters, search by starting or ending letters, or improve your performance in Scrabble, Words With Friends, and other word games.
+              Every morning, millions of players open Wordle to find five empty tiles and one big question: where to start? A five letter word finder answers it in seconds — type in the confirmed letters, rule out the misses, and thousands of possibilities narrow to the few words that still fit.
             </p>
 
-            <section id="how-to-use" className="scroll-mt-8">
-              <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">How to Use the 5-Letter Word Finder</h3>
-              <p className="text-slate-600 leading-relaxed mb-4">
-                Our word finder tool provides four powerful filters to narrow down any puzzle:
+            {/* Screenshot 1: Default tool view */}
+            <figure className="my-8">
+              <Image
+                src="/screenshots/screenshot1.png"
+                alt="The tool as players first see it — 2,309 common matches, top 25 shown."
+                width={1229}
+                height={600}
+                className="w-full h-auto rounded-xl shadow-md border border-slate-200"
+              />
+              <figcaption className="text-xs md:text-sm text-slate-500 italic mt-2.5 text-center">
+                The tool as players first see it — 2,309 common matches, top 25 shown.
+              </figcaption>
+            </figure>
+
+            <p className="text-slate-600 leading-relaxed">
+              5LetterWords.me built its five letter word finder for exactly that moment. It&apos;s free, needs no signup, and runs in a phone browser right beside the Wordle app — whether the puzzle is a daily Wordle, a crossword slot, or a jumble that won&apos;t untangle.
+            </p>
+
+            {/* How the 5 Letter Word Finder Works */}
+            <section id="how-it-works" className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                How the 5 Letter Word Finder Works
+              </h2>
+              <p className="text-slate-600 leading-relaxed mb-6">
+                The tool gives players four simple filters. Combine them, press Find Words, and the match list updates instantly. That&apos;s what makes it a true 5 letter words finder rather than a static word list.
               </p>
-              <ul className="space-y-4 list-none pl-0">
-                <li className="flex gap-4 items-start bg-green-50 p-4 rounded-xl border border-green-100">
-                  <div className="w-6 h-6 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-green-800 mt-0.5">1</div>
-                  <div>
-                    <strong className="text-green-800 text-sm uppercase tracking-wide block mb-1">Position Slots 1–5 (Known Letters / Green)</strong>
-                    <span className="text-slate-600 text-sm">Enter letters that you already know are in the word at specific positions. For example, if you know the word starts with &quot;CA&quot; and ends with &quot;T&quot;, enter &quot;C&quot; in slot 1, &quot;A&quot; in slot 2, and &quot;T&quot; in slot 5.</span>
+
+              <div className="space-y-6 not-prose">
+                {/* Step 1 */}
+                <div className="bg-green-50 p-6 rounded-2xl border border-green-100">
+                  <div className="flex gap-4 items-center mb-3">
+                    <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-green-800">
+                      1
+                    </div>
+                    <h3 className="text-lg font-black text-green-900 uppercase tracking-wide">
+                      Step 1 — Enter Known Letters by Position
+                    </h3>
                   </div>
-                </li>
-                <li className="flex gap-4 items-start bg-yellow-50 p-4 rounded-xl border border-yellow-100">
-                  <div className="w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-yellow-800 mt-0.5">2</div>
-                  <div>
-                    <strong className="text-yellow-700 text-sm uppercase tracking-wide block mb-1">Must Include Letters (Yellow Tiles)</strong>
-                    <span className="text-slate-600 text-sm">Enter letters that you know are in the word but whose position is unknown (yellow tiles in Wordle).</span>
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed mb-4">
+                    The five position boxes are for letters confirmed in a specific spot — the green tiles in Wordle. If the puzzle shows a green C first and a green T last, those go in slots 1 and 5. The classic example: C in slot 1, A in slot 3, N in slot 5 leaves exactly one match — CHAIN.
+                  </p>
+                  {/* Screenshot 2: CHAIN position test */}
+                  <figure className="mt-4">
+                    <Image
+                      src="/screenshots/screenshot2.png"
+                      alt="Position slots in action: C in slot 1, A in slot 3, N in slot 5 narrows the field to a single match — CHAIN."
+                      width={1229}
+                      height={600}
+                      className="w-full h-auto rounded-xl shadow-md border border-green-200"
+                    />
+                    <figcaption className="text-xs text-slate-500 italic mt-2 text-center">
+                      Position slots in action: C in slot 1, A in slot 3, N in slot 5 narrows the field to a single match — CHAIN.
+                    </figcaption>
+                  </figure>
+                </div>
+
+                {/* Step 2 */}
+                <div className="bg-yellow-50 p-6 rounded-2xl border border-yellow-100">
+                  <div className="flex gap-4 items-center mb-3">
+                    <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-yellow-800">
+                      2
+                    </div>
+                    <h3 className="text-lg font-black text-yellow-900 uppercase tracking-wide">
+                      Step 2 — Add Must-Include Letters
+                    </h3>
                   </div>
-                </li>
-                <li className="flex gap-4 items-start bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-slate-800 mt-0.5">3</div>
-                  <div>
-                    <strong className="text-slate-700 text-sm uppercase tracking-wide block mb-1">Must Exclude Letters (Gray Tiles)</strong>
-                    <span className="text-slate-600 text-sm">Enter letters that you know are not in the word at all (gray tiles in Wordle) to eliminate impossible words.</span>
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed mb-4">
+                    Letters that are in the word but sitting in the wrong spot — the yellow tiles — go in the &quot;Must Include&quot; field. One practical note: separate letters with commas, like A,E,L,S,T. Typing them as one unbroken string won&apos;t match anything, so the commas matter.
+                  </p>
+                  {/* Screenshot 3: Include-letters test */}
+                  <figure className="mt-4">
+                    <Image
+                      src="/screenshots/screenshot3.png"
+                      alt="Must-include letters at work: entering ‘A’ narrows the results to 906 matches."
+                      width={1229}
+                      height={600}
+                      className="w-full h-auto rounded-xl shadow-md border border-yellow-200"
+                    />
+                    <figcaption className="text-xs text-slate-500 italic mt-2 text-center">
+                      Must-include letters at work: entering ‘A’ narrows the results to 906 matches.
+                    </figcaption>
+                  </figure>
+                </div>
+
+                {/* Step 3 */}
+                <div className="bg-slate-100 p-6 rounded-2xl border border-slate-200">
+                  <div className="flex gap-4 items-center mb-3">
+                    <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-slate-800">
+                      3
+                    </div>
+                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-wide">
+                      Step 3 — Rule Out Letters
+                    </h3>
                   </div>
-                </li>
-                <li className="flex gap-4 items-start bg-purple-50 p-4 rounded-xl border border-purple-100">
-                  <div className="w-6 h-6 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black text-purple-800 mt-0.5">4</div>
-                  <div>
-                    <strong className="text-purple-800 text-sm uppercase tracking-wide block mb-1">Common Only Toggle</strong>
-                    <span className="text-slate-600 text-sm">Turn this on to see only the most frequently used words — ideal for Wordle where answers are always common words — or turn it off to explore the full Scrabble dictionary.</span>
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed">
+                    Every gray tile — every letter proven absent — goes in the &quot;Must Exclude&quot; field. Each excluded letter shrinks the results dramatically, which is why entering grays is the fastest way to corner a stubborn puzzle.
+                  </p>
+                </div>
+
+                {/* Step 4 */}
+                <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100">
+                  <div className="flex gap-4 items-center mb-3">
+                    <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-black text-purple-800">
+                      4
+                    </div>
+                    <h3 className="text-lg font-black text-purple-900 uppercase tracking-wide">
+                      Step 4 — Toggle Common Words Only
+                    </h3>
                   </div>
-                </li>
-              </ul>
-              <p className="text-slate-600 leading-relaxed mt-6">
-                After entering your letters, click the &quot;Find Words&quot; button to find 5 letter words with these letters. Words that are common and more likely to be Wordle solutions are shown in bold.
+                  <p className="text-slate-700 text-sm md:text-base leading-relaxed mb-4">
+                    With the toggle on, the finder searches everyday words first — the kind of vocabulary Wordle answers are drawn from. Toggle it off and the full dictionary opens up: thousands of additional entries, including obscure Scrabble-valid words like AAHED and AALII.
+                  </p>
+                  {/* Screenshot 4: Common Only toggle off */}
+                  <figure className="mt-4">
+                    <Image
+                      src="/screenshots/screenshot4.png"
+                      alt="Toggling Common Only off opens the full dictionary — 6,030 matches, including obscure entries like AAHED."
+                      width={1229}
+                      height={600}
+                      className="w-full h-auto rounded-xl shadow-md border border-purple-200"
+                    />
+                    <figcaption className="text-xs text-slate-500 italic mt-2 text-center">
+                      Toggling Common Only off opens the full dictionary — 6,030 matches, including obscure entries like AAHED.
+                    </figcaption>
+                  </figure>
+                </div>
+              </div>
+
+              {/* Reading the Results */}
+              <div className="mt-8">
+                <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-wide mb-3">
+                  Reading the Results
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  The tool opens on 2,309 common matches and shows the top 25 alphabetically, with a Show More button for the rest. Narrow the filters and watch that number collapse — going from thousands of candidates to a handful is the whole point.
+                </p>
+              </div>
+            </section>
+
+            {/* The 5 Letter Word Solver Wordle Players Rely On */}
+            <section className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                The 5 Letter Word Solver Wordle Players Rely On
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                Wordle hands players six guesses and five empty slots. A good <Link href="/wordle-solver" className="text-purple-600 hover:underline font-semibold">5 letter word solver</Link> turns those guesses into information instead of gambles: enter each round&apos;s green, yellow, and gray letters, and only the words that still fit the grid survive.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Most regulars open with the best wordle starting words they know — vowel-heavy guesses like <Link href="/starting-with/a" className="text-purple-600 hover:underline font-semibold">ADIEU</Link> or <Link href="/starting-with/a" className="text-purple-600 hover:underline font-semibold">AUDIO</Link> that reveal the puzzle&apos;s skeleton in one move. From there, the solver does the bookkeeping. Used as a wordle hint engine, it answers the only question that matters after guess three: &quot;what can the answer possibly still be?&quot;
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                It proves its worth in wordle hard mode, where revealed letters must be reused and there&apos;s no room for throwaway guesses — the best wordle hard mode tips all start with the same habit: enter every clue before guessing again. That&apos;s also where 5 letter words with double letters turn deadly — ESSAY, KNOLL, and their cousins have ended many runs, because nothing in the early clues warns that a letter repeats. The solver surfaces those traps before they cost a guess.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                A little wordle letter frequency knowledge helps too. <Link href="/starting-with/e" className="text-purple-600 hover:underline font-semibold">E</Link>, <Link href="/starting-with/a" className="text-purple-600 hover:underline font-semibold">A</Link>, <Link href="/starting-with/r" className="text-purple-600 hover:underline font-semibold">R</Link>, <Link href="/starting-with/o" className="text-purple-600 hover:underline font-semibold">O</Link>, and <Link href="/starting-with/t" className="text-purple-600 hover:underline font-semibold">T</Link> carry the most weight in five-letter words, so guesses rich in those letters eliminate the most candidates. And when every vowel is ruled out, there&apos;s a whole corner of the dictionary waiting: 5 letter words with no vowels — think CRYPT, GYPSY, RHYTHM — which the solver finds in one step.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                For anyone guarding a streak, these wordle tips pair well with the tool: enter every guess&apos;s results before guessing again, and when two options remain, favor the more common word. That&apos;s the practical routine behind every &quot;how to keep wordle streak&quot; success story — less luck, more elimination.
               </p>
             </section>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Using Five Letter Word Finder as a 5 Letter Word Unscrambler</h3>
-            <p className="text-slate-600 leading-relaxed">
-              To unscramble 5 letters into words, simply enter the letters you want to unscramble into the &quot;Include Letters&quot; (Yellow) field and leave the other fields empty. Our tool will generate a list of all possible words that can be made from those letters. For example, here is the list of 12 words that can be formed from the letters A, E, L, S, T, including &quot;LEAST&quot;, &quot;SLATE&quot;, &quot;STALE&quot;, and &quot;STEAL&quot;.
-            </p>
+            {/* Unscramble Letters Into 5 Letter Words */}
+            <section className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                Unscramble Letters Into 5 Letter Words
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                Not every puzzle is Wordle. Sometimes players just have a jumble — five letters from a game, a worksheet, or a brain teaser — and need every word those letters can build. Drop them into the Must-Include field, comma-separated, and the finder doubles as a 5 letter anagram solver.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Enter A,E,L,S,T and it returns four words: LEAST, SLATE, STALE, and STEAL. Whether someone calls it a word solver 5 letters tool or an anagram helper, the job is the same — turn a pile of letters into answers.
+              </p>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Finding 5 Letter Words by Position</h3>
-            <p className="text-slate-600 leading-relaxed">
-              If you know the position of certain letters in the word, you can use our tool to find words that match those positions. For example, if you know that the first letter in the word is &quot;C&quot;, the third letter is &quot;A&quot; and the last letter is &quot;N&quot;, you can enter &quot;C&quot; in the first green box, &quot;A&quot; in the third, and &quot;N&quot; in the 5th (last) green box. Press &quot;Find Words&quot; and you&apos;ll find the word you&apos;re looking for (in this case, &quot;CHAIN&quot; is the only word that matches this criteria).
-            </p>
+              {/* Screenshot 5: A,E,L,S,T unscramble test */}
+              <figure className="my-8">
+                <Image
+                  src="/screenshots/screenshot5.png"
+                  alt="Unscrambling in action: A,E,L,S,T returns exactly four words — LEAST, SLATE, STALE, STEAL."
+                  width={1228}
+                  height={539}
+                  className="w-full h-auto rounded-xl shadow-md border border-slate-200"
+                />
+                <figcaption className="text-xs md:text-sm text-slate-500 italic mt-2.5 text-center">
+                  Unscrambling in action: A,E,L,S,T returns exactly four words — LEAST, SLATE, STALE, STEAL.
+                </figcaption>
+              </figure>
+            </section>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Wordle Strategy Tips</h3>
-            <p className="text-slate-600 leading-relaxed mb-4">
-              Some proven strategies to improve your Wordle game:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-600 marker:text-purple-500">
-              <li>Start with vowel-rich words like &quot;<Link href="/starting-with/a" className="text-purple-600 hover:underline">ADIEU</Link>&quot; or &quot;<Link href="/starting-with/a" className="text-purple-600 hover:underline">AUDIO</Link>&quot; to quickly identify which vowels are in the puzzle.</li>
-              <li>Use common consonants early such as <Link href="/starting-with/l" className="text-purple-600 hover:underline">L</Link>, <Link href="/starting-with/n" className="text-purple-600 hover:underline">N</Link>, <Link href="/starting-with/r" className="text-purple-600 hover:underline">R</Link>, <Link href="/starting-with/s" className="text-purple-600 hover:underline">S</Link>, and <Link href="/starting-with/t" className="text-purple-600 hover:underline">T</Link> to maximize the information from your first guesses.</li>
-              <li>Pay attention to letter frequency - letters like <Link href="/starting-with/a" className="text-purple-600 hover:underline">A</Link>, <Link href="/starting-with/e" className="text-purple-600 hover:underline">E</Link>, I, O, R appear most often in five-letter words.</li>
-              <li>Eliminate possibilities systematically by using the Exclude Letters (Gray) field to track letters you&apos;ve ruled out.</li>
-              <li>Consider word patterns - many English words follow common patterns like consonant-vowel-consonant-vowel-consonant (CVCVC).</li>
-            </ul>
+            {/* Browse 5 Letter Words by Letter and Pattern */}
+            <section className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                Browse 5 Letter Words by Letter and Pattern
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                Some searches don&apos;t start with clues at all. Players often just need words shaped a certain way, and the built-in five-letter word finder dictionary is organized to serve exactly that.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                The letter pages cover every starting letter A through Z — the <Link href="/starting-with/s" className="text-purple-600 hover:underline font-semibold">5 letter words starting with s</Link> collection, for example, is one of the busiest, since S opens more English words than any other letter. Beyond starting letters, players browse 5 letter words ending in y for that classic Wordle finale, or <Link href="/starting-with/z" className="text-purple-600 hover:underline font-semibold">5 letter words with z</Link> (and X and Q) when the rare letters refuse to cooperate.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Vowel hunters have their own corners: <Link href="/starting-with/a" className="text-purple-600 hover:underline font-semibold">5 letter words with a</Link> for the most common vowel of all, and 5 letter words with 2 vowels for balanced guesses. Positional searches go deeper still — 5 letter words 3rd letter a narrows the field to a single slot, which is devastatingly effective in late-game Wordle.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                Writers and puzzle makers browse by word type instead: 5 letter nouns for headlines and crossword fills, 5 letter verbs for sharper sentences. And for the purely curious, there&apos;s the 5 letter palindromes shelf — short, strange, and wonderful.
+              </p>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Sharing Search Results</h3>
-            <p className="text-slate-600 leading-relaxed">
-              Our word finder tool allows you to save your search results for future reference or sharing. When you click the &quot;Find Words&quot; button, you will be redirected to a page that specifically shows only your search results. You can then share or bookmark this page for future reference.
-            </p>
+              {/* A-Z Letter Grid */}
+              <div className="not-prose my-8 p-6 bg-slate-100 rounded-2xl border border-slate-200">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 text-center">
+                  Browse by Starting Letter (A–Z)
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {alphabet.map((letter) => (
+                    <Link
+                      key={letter}
+                      href={`/starting-with/${letter}`}
+                      className="w-9 h-9 flex items-center justify-center bg-white hover:bg-purple-600 hover:text-white text-slate-800 font-bold text-sm rounded-xl border border-slate-200 transition-colors shadow-sm"
+                    >
+                      {letter.toUpperCase()}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Reporting a Technical Issue</h3>
-            <p className="text-slate-600 leading-relaxed">
-              If you encounter any technical issues with our website, please contact us at our email and we will do our best to resolve the issue as soon as possible.
-            </p>
+            {/* Built for Every Word Game */}
+            <section className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                Built for Every Word Game
+              </h2>
+              <p className="text-slate-600 leading-relaxed mb-6">
+                Wordle may be the headline act, but the same four filters serve every word game in the house:
+              </p>
+              <div className="not-prose space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Scrabble
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Tournament players sanity-check 5 letter words scrabble plays before committing tiles, especially the obscure two-vowel dumps that win games.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Words With Friends
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    The 5 letter words words with friends crowd uses the include/exclude fields to test high-scoring placements.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Crosswords
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Stuck on a five-letter slot? 5 letter crossword answers fall out of the position boxes in seconds — enter the known letters, leave the rest blank.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Wordle variants
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Fans of games like wordle, from Dordle to Quordle, reuse the exact same workflow with more grids to feed.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Creativity
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    A random 5 letter words generator sparks usernames, team names, and writing prompts.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <span className="font-bold text-slate-900 min-w-[170px] uppercase text-xs tracking-wider text-purple-700">
+                    Learning
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Teachers and parents use the calmer corners of the dictionary for wordle for kids activities, building vocabulary one five-letter word at a time.
+                  </p>
+                </div>
+              </div>
+            </section>
 
-            <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">Suggesting New Features</h3>
-            <p className="text-slate-600 leading-relaxed">
-              We are always looking for ways to improve our website and make it more useful for our users. If you have any suggestions for new features or improvements, please contact us at 5letterwords.me.
-            </p>
+            {/* Fair Play: Is Using a Word Finder Cheating? */}
+            <section className="scroll-mt-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mt-12 mb-6">
+                Fair Play: Is Using a Word Finder Cheating?
+              </h2>
+              <p className="text-slate-600 leading-relaxed">
+                It&apos;s a fair question, and searches for a wordle solver cheat prove players ask it often. The honest answer depends on the game being played. In a friendly Wordle competition, solving unaided is the whole sport — the solver is best kept as a last resort when the streak is on the line. For solo play, learning, or just getting on with the day, it&apos;s simply a tool.
+              </p>
+              <p className="text-slate-600 leading-relaxed">
+                A five letter word solver doesn&apos;t replace thinking; it organizes it. And these word finder tips make it a genuine learning aid: study <em>why</em> the surviving words fit, notice the letter patterns, and the next puzzle gets easier without any help at all.
+              </p>
+            </section>
 
             {/* Frequently Asked Questions */}
-            <section className="mt-12 pt-8 border-t border-slate-200">
-              <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-wide mb-6">
+            <section className="mt-16 pt-12 border-t border-slate-200">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase italic tracking-wide mb-8">
                 Frequently Asked Questions
-              </h3>
-              <div className="space-y-4">
-                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
-                    <h4 className="font-bold text-slate-900 text-sm">Can I use this tool for Scrabble?</h4>
+              </h2>
+              <div className="space-y-4 not-prose">
+                {faqData.map((item, index) => (
+                  <div key={index} className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm">
+                    <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                      <h3 className="font-bold text-slate-900 text-base">
+                        {item.question}
+                      </h3>
+                    </div>
+                    <div className="px-6 py-4">
+                      <p className="text-slate-600 text-sm leading-relaxed">
+                        {item.answer}
+                      </p>
+                    </div>
                   </div>
-                  <div className="px-6 py-4">
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                      Absolutely. Toggle off &quot;Common Only&quot; to see the full dictionary including less common words that are still valid in Scrabble. This reveals many high-value words useful for competitive play.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
-                    <h4 className="font-bold text-slate-900 text-sm">How do I use the Wordle solver?</h4>
-                  </div>
-                  <div className="px-6 py-4">
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                      Type confirmed green letters into their exact position slots (1–5), add yellow letters to &quot;Must Include&quot;, and enter gray letters into &quot;Must Exclude&quot;. The list updates in real time to display every valid remaining word.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </section>
           </div>
