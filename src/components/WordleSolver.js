@@ -203,7 +203,7 @@ export default function WordleSolver({ wordData }) {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <Hash size={16} className="text-slate-900" />
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">Wordle Solver</h3>
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Wordle Solver</span>
                 </div>
                 <button
                   onClick={handleReset}
@@ -335,9 +335,9 @@ export default function WordleSolver({ wordData }) {
               {/* Results Header */}
               <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                 <div className="space-y-1">
-                  <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight italic">
+                  <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight italic">
                     Wordle Solver
-                  </h1>
+                  </h2>
                   <div className="flex items-center gap-4 mt-2">
                     <div className="text-sm font-bold text-slate-600 uppercase tracking-wider">
                       {total.toLocaleString()} Matches Found
